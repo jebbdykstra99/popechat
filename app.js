@@ -6,6 +6,18 @@
   const LS_LIKES = 'popechat.likes';
   const LS_POSTS = 'popechat.localPosts';
 
+  const firebaseConfig = {
+    apiKey: "AIzaSyA0AGKwIt3jWCdivlb573i19XEDm12zxIE",
+    authDomain: "bakasan-art.firebaseapp.com",
+    projectId: "bakasan-art",
+    storageBucket: "bakasan-art.firebasestorage.app",
+    messagingSenderId: "839964323046",
+    appId: "1:839964323046:web:ef9ddbbef5f64acfc2df27",
+    measurementId: "G-31WPTPSZQW"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const fbAuth = firebase.auth();
+
   const hamburger = document.getElementById('hamburger');
   const sidebar = document.getElementById('sidebar');
 
@@ -407,9 +419,28 @@
   function signOut() {
     currentUser = null;
     saveJSON(LS_USER, null);
+    if (fbAuth.currentUser) fbAuth.signOut();
     renderSidebarAuth();
     syncProfile();
   }
+
+  function applyFirebaseUser(user) {
+    var emailLocal = (user.email || '').split('@')[0];
+    var name = user.displayName || emailLocal || 'Member';
+    var handle = (emailLocal || name).replace(/^@/, '').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 15) || 'member';
+    currentUser = {
+      name: name,
+      handle: handle,
+      bio: 'the Holy See, talking.'
+    };
+    saveJSON(LS_USER, currentUser);
+    renderSidebarAuth();
+    syncProfile();
+    closeAuth();
+  }
+  fbAuth.onAuthStateChanged(function (user) {
+    if (user) applyFirebaseUser(user);
+  });
 
   function maybePost() {
     const input = document.getElementById('thoughts-compose-input');
@@ -580,7 +611,16 @@
     err.classList.add('show');
     setTimeout(function () { stubSignIn(name, name.replace(/\s+/g, '').slice(0, 12)); }, 500);
   });
-  document.getElementById('cv-google-login').addEventListener('click', function () { stubSignIn('Guest', 'guest415'); });
+  document.getElementById('cv-google-login').addEventListener('click', function () {
+    var err = document.getElementById('cv-login-err');
+    err.classList.remove('show');
+    var gProvider = new firebase.auth.GoogleAuthProvider();
+    fbAuth.signInWithPopup(gProvider).catch(function (e) {
+      err.textContent = e.message || String(e);
+      err.classList.add('show');
+    });
+  });
+  document.getElementById('cv-guest-login').addEventListener('click', function () { stubSignIn('Guest', 'guest415'); });
 
   const search = document.getElementById('explore-search-input');
   search.addEventListener('input', function () {
