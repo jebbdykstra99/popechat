@@ -397,7 +397,7 @@
   function stubSignIn(name, handle) {
     currentUser = {
       name: name || 'Guest',
-      handle: (handle || 'guest415').replace(/^@/, '').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 15) || 'guest415',
+      handle: (handle || 'guestpope').replace(/^@/, '').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 15) || 'guestpope',
       bio: 'the Holy See, talking.'
     };
     saveJSON(LS_USER, currentUser);
@@ -572,7 +572,7 @@
     const err = document.getElementById(errId);
     err.textContent = 'Dress rehearsal — no live auth. Continuing as guest.';
     err.classList.add('show');
-    setTimeout(function () { stubSignIn('Guest', 'guest415'); }, 500);
+    setTimeout(function () { stubSignIn('Guest', 'guestpope'); }, 500);
   }
   document.getElementById('cv-login-btn').addEventListener('click', function () { stubSubmit('cv-login-err'); });
   document.getElementById('cv-reg-btn').addEventListener('click', function () {
@@ -584,10 +584,10 @@
   });
   document.getElementById('cv-google-login').addEventListener('click', function () {
     var err = document.getElementById('cv-login-err');
-    err.textContent = 'Google sign-in waits on HTTPS and a SubX identity project. Not bakasan.art. Use guest for now.';
+    err.textContent = 'Email and password will be live after HTTPS. Google is off until that provider is enabled.';
     err.classList.add('show');
   });
-  document.getElementById('cv-guest-login').addEventListener('click', function () { stubSignIn('Guest', 'guest415'); });
+  document.getElementById('cv-guest-login').addEventListener('click', function () { stubSignIn('Guest', 'guestpope'); });
 
   const search = document.getElementById('explore-search-input');
   search.addEventListener('input', function () {
