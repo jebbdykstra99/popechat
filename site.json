@@ -1,0 +1,350 @@
+{
+  "siteId": "popechat",
+  "name": "popechat",
+  "tagline": "Urbi et orbi.",
+  "composePlaceholder": "What's on your mind, in the square?",
+  "emptyState": "This room is empty. Sign in with email to speak in the square. Guest can browse only.",
+  "theme": {
+    "bg": "#f6f0e6",
+    "surface": "#fbf7f0",
+    "nav-bg": "#3b1848",
+    "nav-text": "#9bb0c0",
+    "nav-hover": "#d5e2ea",
+    "nav-active": "#f4f8fb",
+    "text": "#24181c",
+    "text-muted": "#4a5d6c",
+    "text-light": "#6d8292",
+    "accent": "#c4a056",
+    "accent-dark": "#9a7c3a",
+    "teal": "#6b4a63",
+    "silver": "#b8c5cf",
+    "border": "#c9d5de",
+    "avatarColors": [
+      "#3b1848",
+      "#c4a056",
+      "#9a7c3a",
+      "#6b4a63",
+      "#5a2868",
+      "#2a1028"
+    ]
+  },
+  "trends": [
+    {
+      "tag": "Letter",
+      "headline": "Read the encyclical like a letter, not a headline",
+      "snippet": "Dummy desk. The office writes slowly on purpose. Not official Vatican.",
+      "meta": "From the letter"
+    },
+    {
+      "tag": "Square",
+      "headline": "The square is a public room",
+      "snippet": "Pigeons, pilgrims, cameras. Dummy note. The greeting is to the city and the world.",
+      "meta": "In the square"
+    },
+    {
+      "tag": "Office",
+      "headline": "The chair is an office, not a brand",
+      "snippet": "Talk about the See. Do not invent a sitting name as live news. Dummy feed.",
+      "meta": "Urbi et orbi"
+    },
+    {
+      "tag": "Charity",
+      "headline": "Charity first, culture war never",
+      "snippet": "Hospitals, food, a quiet collection. Dummy, not a fundraiser.",
+      "meta": "From the letter"
+    },
+    {
+      "tag": "Conclave",
+      "headline": "White smoke is a process, not a meme",
+      "snippet": "How the church picks. Civic knowledge. Dummy, not a prediction market.",
+      "meta": "The See"
+    },
+    {
+      "tag": "Greeting",
+      "headline": "Urbi et orbi. To the city and the world.",
+      "snippet": "A blessing that names everyone. Dummy feed. Not a homily. Not official.",
+      "meta": "Urbi et orbi"
+    }
+  ],
+  "places": [
+    {
+      "tag": "Letter",
+      "title": "Encyclicals",
+      "snippet": "Long letters to the church and anyone who will read slowly."
+    },
+    {
+      "tag": "Letter",
+      "title": "Urbi et orbi",
+      "snippet": "To the city and the world. A greeting, not a slogan."
+    },
+    {
+      "tag": "Letter",
+      "title": "The office",
+      "snippet": "The chair outlasts the man. Dummy talk, not a biography."
+    },
+    {
+      "tag": "Letter",
+      "title": "Charity",
+      "snippet": "Hospitals and bread before the argument."
+    },
+    {
+      "tag": "Letter",
+      "title": "Footnotes of mercy",
+      "snippet": "Read the poor into the document. Dummy desk."
+    },
+    {
+      "tag": "Letter",
+      "title": "Not a homily",
+      "snippet": "This site is a room. Mass is elsewhere."
+    }
+  ],
+  "topics": [
+    {
+      "tag": "Square",
+      "title": "St. Peter’s square",
+      "snippet": "A public room with a colonnade. Dummy postcard."
+    },
+    {
+      "tag": "Square",
+      "title": "White smoke",
+      "snippet": "The process, explained calmly. Not a countdown clock."
+    },
+    {
+      "tag": "Square",
+      "title": "The Swiss and the doors",
+      "snippet": "Ceremony as civic furniture. Dummy, not a tour."
+    },
+    {
+      "tag": "Square",
+      "title": "Pilgrims",
+      "snippet": "People who came a long way and are tired. Be kind in the thread."
+    },
+    {
+      "tag": "Square",
+      "title": "Bells",
+      "snippet": "Timekeeping for a city that still listens."
+    },
+    {
+      "tag": "Square",
+      "title": "Not official Vatican",
+      "snippet": "We are a dress rehearsal. They have a press office."
+    }
+  ],
+  "seedNote": "sample — not mixed into the live feed",
+  "seed": [
+    {
+      "id": "p1",
+      "name": "Urbi et Orbi",
+      "handle": "urbietorbi",
+      "text": "To the city and the world. That is the whole greeting. Dummy feed. Not official Vatican. Not a meme.",
+      "hours": 1,
+      "likes": 146,
+      "replies": 18,
+      "followed": true
+    },
+    {
+      "id": "p2",
+      "name": "The Square",
+      "handle": "thesquare",
+      "text": "The square is a public room. Cameras, pilgrims, pigeons. Talk like you are standing in it, not dunking from a couch.",
+      "hours": 2,
+      "likes": 98,
+      "replies": 12,
+      "followed": true
+    },
+    {
+      "id": "p3",
+      "name": "Encyclical Desk",
+      "handle": "encyclicaldesk",
+      "text": "Read the letter slowly. Headlines flatten it. Dummy desk. The office writes on purpose, not for the cycle.",
+      "hours": 3,
+      "likes": 121,
+      "replies": 16,
+      "followed": true
+    },
+    {
+      "id": "p4",
+      "name": "White Smoke",
+      "handle": "whitesmoke",
+      "text": "White smoke is a process with rules. Civic knowledge, not a betting market. Dummy, not a prediction.",
+      "hours": 5,
+      "likes": 87,
+      "replies": 11,
+      "followed": false
+    },
+    {
+      "id": "p5",
+      "name": "Charity First",
+      "handle": "charityfirst",
+      "text": "Hospitals and bread before the argument. If the thread cannot hold that, it is not this room.",
+      "hours": 7,
+      "likes": 154,
+      "replies": 21,
+      "followed": true
+    },
+    {
+      "id": "p6",
+      "name": "Holy See Desk",
+      "handle": "holyseedesk",
+      "text": "The See is an office. We will not invent a sitting name as live news on a dummy feed. Talk about the chair.",
+      "hours": 8,
+      "likes": 76,
+      "replies": 9,
+      "followed": true
+    },
+    {
+      "id": "p7",
+      "name": "Keys",
+      "handle": "twokeys",
+      "text": "Keys in a purple square is a mark, not a coat of arms. We are not the press office. Dummy rehearsal.",
+      "hours": 10,
+      "likes": 64,
+      "replies": 7,
+      "followed": false
+    },
+    {
+      "id": "p8",
+      "name": "Colonnade",
+      "handle": "colonnade",
+      "text": "Bernini built a pair of arms. The architecture is the metaphor. Dummy postcard from the square.",
+      "hours": 12,
+      "likes": 91,
+      "replies": 8,
+      "followed": false
+    },
+    {
+      "id": "p9",
+      "name": "Quiet Collection",
+      "handle": "quietcollection",
+      "text": "A collection that does not need a camera. Charity first. Dummy, not a fundraiser.",
+      "hours": 14,
+      "likes": 70,
+      "replies": 6,
+      "followed": true
+    },
+    {
+      "id": "p10",
+      "name": "Bells",
+      "handle": "romanbells",
+      "text": "Bells keep time for people who still look up. Dummy note. The city is in the greeting.",
+      "hours": 16,
+      "likes": 55,
+      "replies": 4,
+      "followed": false
+    },
+    {
+      "id": "p11",
+      "name": "Pilgrim Thread",
+      "handle": "pilgrimthread",
+      "text": "If you walked a long way, you get the benefit of the doubt. Be kind in the square. Dummy etiquette.",
+      "hours": 18,
+      "likes": 102,
+      "replies": 13,
+      "followed": true
+    },
+    {
+      "id": "p12",
+      "name": "Not a Homily",
+      "handle": "notahomily",
+      "text": "Mass is elsewhere. This is a room for talking about the office and the letters. Dummy. Not X.com.",
+      "hours": 20,
+      "likes": 83,
+      "replies": 10,
+      "followed": true
+    },
+    {
+      "id": "p13",
+      "name": "Footnotes",
+      "handle": "letterfootnotes",
+      "text": "The poor are in the footnotes if you actually read. Dummy desk. Culture war is a bad lector.",
+      "hours": 22,
+      "likes": 117,
+      "replies": 15,
+      "followed": true
+    },
+    {
+      "id": "p14",
+      "name": "Sede",
+      "handle": "sedevacantjoke",
+      "text": "No conspiracy threads. The process is public enough. Dummy feed. Go outside if you need a conclave rumor.",
+      "hours": 26,
+      "likes": 61,
+      "replies": 9,
+      "followed": false
+    },
+    {
+      "id": "p15",
+      "name": "World",
+      "handle": "adorbem",
+      "text": "Orbi means the world. Include people who are not already in your parish group chat. Dummy, still the point.",
+      "hours": 30,
+      "likes": 99,
+      "replies": 11,
+      "followed": true
+    },
+    {
+      "id": "p16",
+      "name": "City",
+      "handle": "adurbi",
+      "text": "Urbi means the city. Rome first, then everyone. The greeting still works if you are not there.",
+      "hours": 34,
+      "likes": 88,
+      "replies": 8,
+      "followed": true
+    }
+  ],
+  "notifs": [
+    {
+      "id": "n1",
+      "text": "@urbietorbi liked your take.",
+      "time": "1h",
+      "unread": true
+    },
+    {
+      "id": "n2",
+      "text": "@thesquare mentioned you. Dummy mention.",
+      "time": "3h",
+      "unread": true
+    },
+    {
+      "id": "n3",
+      "text": "@encyclicaldesk started following you. Dummy follow.",
+      "time": "Yesterday",
+      "unread": true
+    }
+  ],
+  "threads": [
+    {
+      "id": "t1",
+      "name": "Urbi et Orbi",
+      "handle": "urbietorbi",
+      "preview": "To the city and the world. That is the whole greeting. Dummy feed. Not o",
+      "messages": [
+        {
+          "me": false,
+          "text": "To the city and the world. That is the whole greeting. Dummy feed. Not official Vatican. Not a meme."
+        },
+        {
+          "me": true,
+          "text": "Dummy reply. Sample inbox only."
+        }
+      ]
+    },
+    {
+      "id": "t2",
+      "name": "The Square",
+      "handle": "thesquare",
+      "preview": "The square is a public room. Cameras, pilgrims, pigeons. Talk like you a",
+      "messages": [
+        {
+          "me": false,
+          "text": "The square is a public room. Cameras, pilgrims, pigeons. Talk like you are standing in it, not dunking from a couch."
+        },
+        {
+          "me": true,
+          "text": "Dummy reply. Sample inbox only."
+        }
+      ]
+    }
+  ]
+}
