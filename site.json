@@ -347,5 +347,28 @@
         }
       ]
     }
-  ]
+  ],
+  "rail": {
+    "kind": "porch",
+    "title": "Room Brief",
+    "kicker": "Urbi et orbi",
+    "meta": "From the source",
+    "footer": "Vatican News as a link. Not a lectionary paste. Ads off.",
+    "outbound": [
+      {
+        "tag": "Vatican",
+        "headline": "Vatican News",
+        "snippet": "The office, the letters, from the source.",
+        "url": "https://www.vaticannews.va/en.html",
+        "meta": "Official · link-out"
+      }
+    ],
+    "porch": {
+      "prompt": "A blessing or a question?",
+      "options": [
+        "Blessing",
+        "Question"
+      ]
+    }
+  }
 }
