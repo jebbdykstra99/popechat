@@ -26,7 +26,14 @@
   let siteKilled = false;
   let blockedUids = {};
   let blocksUnsub = null;
+  let convsUnsub = null;
+  let msgsUnsub = null;
+  let dmConversations = [];
+  let activeConvId = null;
+  let pendingPeer = null;
+  let viewingProfile = null;
   const ADMIN_UID = 'o774wL9hUVSi19EkDCgLqQomP8i2';
+  const DM_TEXT_MAX = 1000;
 
   try {
     firebase.initializeApp({
@@ -246,17 +253,21 @@
     return !!(u && u.emailVerified);
   }
   function requireVerified(action) {
+    function gateErr(msg) {
+      if (action === 'chat') chatErr(msg);
+      else composeErr(msg);
+    }
     if (!isLiveUser()) {
-      composeErr('Sign in to ' + (action || 'post') + '. Guest can only browse.');
+      gateErr('Sign in to ' + (action || 'post') + '. Guest can only browse.');
       openAuth('join');
       return false;
     }
     if (siteKilled) {
-      composeErr('This room is paused.');
+      gateErr('This room is paused.');
       return false;
     }
     if (!isEmailVerified()) {
-      composeErr('Verify your email before you ' + (action || 'post') + '. Check your inbox, then refresh.');
+      gateErr('Verify your email before you ' + (action || 'post') + '. Check your inbox, then refresh.');
       var u = fbAuth.currentUser;
       if (u && u.sendEmailVerification) u.sendEmailVerification().catch(function () {});
       return false;
@@ -298,6 +309,7 @@
       blockedUids = {};
       snap.forEach(function (d) { blockedUids[d.id] = true; });
       renderFeed();
+      if (dmsOn()) syncChatChrome();
     }, function () {});
   }
   function reportPost(id) {
@@ -423,8 +435,18 @@
     }
   }
 
+  function dmsOn() {
+    return !!(site && site.dms === true);
+  }
+
   function hideDummyChrome() {
     document.querySelectorAll('[data-soon]').forEach(function (el) {
+      if (dmsOn() && (el.id === 'nav-chat' || el.getAttribute('data-social') === 'chat')) {
+        el.classList.remove('is-soon');
+        var liveBadge = el.querySelector('.nav-soon');
+        if (liveBadge) liveBadge.remove();
+        return;
+      }
       el.classList.add('is-soon');
       if (!el.querySelector('.nav-soon')) {
         var badge = document.createElement('span');
@@ -442,6 +464,7 @@
     document.body.classList.toggle('is-live', isLiveUser());
     document.body.classList.toggle('is-guest', !isLiveUser());
     syncEarlyWelcome();
+    syncChatChrome();
   }
 
   function earlyWelcomeOn() {
@@ -449,7 +472,7 @@
   }
 
   function earlyWelcomeKey(uid) {
-    return 'subx.earlyWelcome.' + (SITE_ID || '') + '.' + String(uid || '');
+    return 'subx.earlyWelcome.v2.' + (SITE_ID || '') + '.' + String(uid || '');
   }
 
   function earlyWelcomeDismissed(uid) {
@@ -500,7 +523,7 @@
       el.className = 'early-welcome';
       el.setAttribute('role', 'status');
       el.innerHTML =
-        '<div class="early-welcome-copy">You\'re early. This room is live but unfinished. Post if you want. We\'re learning what you need.</div>' +
+        '<div class="early-welcome-copy">You\'re early. This room is live but unfinished. Who do you sit with on the grid — driver, team, or both? Tell the room.</div>' +
         '<button type="button" class="early-welcome-dismiss" id="early-welcome-dismiss" aria-label="Dismiss">&times;</button>';
       var compose = document.getElementById('thoughts-compose-wrap');
       if (compose && compose.parentNode) compose.parentNode.insertBefore(el, compose.nextSibling);
@@ -531,8 +554,10 @@
     closeAuth();
     renderSidebarAuth();
     hideDummyChrome();
+    syncChatChrome();
     syncProfile();
     listenBlocks(user.uid);
+    listenConversations();
     restoreCompose(draft);
     if (shouldLand) landInFeedCompose();
     if (!user.emailVerified) {
@@ -750,7 +775,11 @@
         '<div class="post-avatar" style="background:' + bg + '">' + av + '</div>' +
         '<div class="post-body">' +
           '<div class="post-meta">' +
-            '<span class="post-name">' + escapeHtml(post.name) + '</span>' +
+            '<span class="post-name' + (dmsOn() && post.authorUid ? ' post-name-link' : '') + '"' +
+              (dmsOn() && post.authorUid
+                ? ' data-profile-uid="' + escapeHtml(post.authorUid) + '" data-profile-name="' + escapeHtml(post.name) + '" data-profile-handle="' + escapeHtml(post.handle) + '"'
+                : '') +
+            '>' + escapeHtml(post.name) + '</span>' +
             '<span class="post-handle">@' + escapeHtml(post.handle) + '</span>' +
             '<span class="post-time">· ' + (post.hours != null ? post.hours + 'h' : 'now') + '</span>' +
           '</div>' +
@@ -1174,13 +1203,14 @@
 
   function f1FormatLocal(d) {
     if (!d) return '';
-    return d.toLocaleString(undefined, {
+    return d.toLocaleString('en-US', {
+      timeZone: 'America/Denver',
       weekday: 'short',
       month: 'short',
       day: 'numeric',
       hour: 'numeric',
       minute: '2-digit'
-    });
+    }) + ' MT';
   }
 
   function f1Sessions(race) {
@@ -1271,6 +1301,238 @@
     });
   }
 
+  function openf1Url(path) {
+    var base = String(railCfg().openf1 || 'https://api.openf1.org/v1').replace(/\/+$/, '');
+    return base + path;
+  }
+
+  function fetchOpenF1Json(path) {
+    function once(retried) {
+      return fetch(openf1Url(path)).then(function (res) {
+        if (res.status === 429 && !retried) {
+          return new Promise(function (resolve) {
+            setTimeout(function () { resolve(once(true)); }, 1000);
+          });
+        }
+        if (res.status === 401 || res.status === 403) return null;
+        if (!res.ok) return null;
+        return res.json();
+      }).then(function (data) {
+        return Array.isArray(data) && data.length ? data : null;
+      }).catch(function () {
+        return null;
+      });
+    }
+    return once(false);
+  }
+
+  function f1ParseIso(s) {
+    if (!s) return null;
+    var d = new Date(s);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  function f1OpenF1Tag(sess) {
+    var raw = String((sess && (sess.session_name || sess.session_type)) || '');
+    if (/practice\s*1/i.test(raw) || /^fp1$/i.test(raw)) return 'FP1';
+    if (/practice\s*2/i.test(raw) || /^fp2$/i.test(raw)) return 'FP2';
+    if (/practice\s*3/i.test(raw) || /^fp3$/i.test(raw)) return 'FP3';
+    if (/sprint\s*qual/i.test(raw) || /shootout/i.test(raw)) return 'Sprint Quali';
+    if (/sprint/i.test(raw)) return 'Sprint';
+    if (/qual/i.test(raw)) return 'Quali';
+    if (/race/i.test(raw)) return 'Race';
+    return raw || 'Session';
+  }
+
+  function f1FormatDuration(duration) {
+    if (duration == null || duration === '') return '';
+    if (Object.prototype.toString.call(duration) === '[object Array]') {
+      var last = null;
+      var i;
+      for (i = duration.length - 1; i >= 0; i--) {
+        if (duration[i] != null && duration[i] !== '') { last = duration[i]; break; }
+      }
+      return f1FormatDuration(last);
+    }
+    if (typeof duration === 'string') {
+      var trimmed = duration.replace(/^\s+|\s+$/g, '');
+      if (!trimmed) return '';
+      if (/lap/i.test(trimmed)) return trimmed;
+      if (trimmed.indexOf(':') !== -1) return trimmed;
+      var parsed = parseFloat(trimmed);
+      if (isNaN(parsed)) return trimmed;
+      duration = parsed;
+    }
+    if (typeof duration !== 'number' || !isFinite(duration)) return '';
+    var sign = duration < 0 ? '-' : '';
+    var abs = Math.abs(duration);
+    var mins = Math.floor(abs / 60);
+    var secs = abs - mins * 60;
+    var secStr = secs.toFixed(3);
+    if (secs < 10) secStr = '0' + secStr;
+    return sign + mins + ':' + secStr;
+  }
+
+  function f1FormatGap(gap) {
+    if (gap == null || gap === '') return '';
+    if (typeof gap === 'string') {
+      var g = gap.replace(/^\s+|\s+$/g, '');
+      if (!g || /^0+(\.0+)?$/.test(g)) return '';
+      if (/lap/i.test(g)) return g.charAt(0) === '+' ? g : ('+' + g);
+      if (g.charAt(0) === '+') return g;
+      var n = parseFloat(g);
+      if (isNaN(n)) return g;
+      gap = n;
+    }
+    if (typeof gap !== 'number' || !isFinite(gap) || gap === 0) return '';
+    return (gap < 0 ? '-' : '+') + Math.abs(gap).toFixed(3);
+  }
+
+  function f1DriverLabel(drv) {
+    if (!drv) return '';
+    var acr = String(drv.name_acronym || '').replace(/^\s+|\s+$/g, '');
+    if (acr) return acr;
+    var last = String(drv.last_name || '').replace(/^\s+|\s+$/g, '');
+    if (last) return last;
+    if (drv.driver_number != null) return String(drv.driver_number);
+    return '';
+  }
+
+  function f1Top3Line(results, drivers) {
+    var byNum = {};
+    var i;
+    if (drivers) {
+      for (i = 0; i < drivers.length; i++) {
+        var d = drivers[i];
+        if (d && d.driver_number != null) byNum[String(d.driver_number)] = d;
+      }
+    }
+    var rows = (results || []).slice();
+    rows.sort(function (a, b) {
+      return (Number(a && a.position) || 99) - (Number(b && b.position) || 99);
+    });
+    var parts = [];
+    for (i = 0; i < rows.length && parts.length < 3; i++) {
+      var row = rows[i];
+      if (!row) continue;
+      var label = f1DriverLabel(byNum[String(row.driver_number)]) || String(row.driver_number || '');
+      if (!label) continue;
+      if (parts.length === 0) {
+        var time = f1FormatDuration(row.duration);
+        if (!time) continue;
+        parts.push(label + ' ' + time);
+      } else {
+        var gap = f1FormatGap(row.gap_to_leader);
+        if (gap) parts.push(label + ' ' + gap);
+        else {
+          var fallback = f1FormatDuration(row.duration);
+          if (fallback) parts.push(label + ' ' + fallback);
+        }
+      }
+    }
+    return parts.join(' · ');
+  }
+
+  function overlayOpenF1Cards(cards, cfg) {
+    if (!cards || !cards.length) return Promise.resolve(cards);
+    return fetchOpenF1Json('/sessions?session_key=latest').then(function (latest) {
+      var meetingKey = latest && latest[0] && latest[0].meeting_key;
+      if (meetingKey == null) return cards;
+      return fetchOpenF1Json('/sessions?meeting_key=' + encodeURIComponent(meetingKey)).then(function (sessions) {
+        if (!sessions || !sessions.length) return cards;
+        var now = Date.now();
+        var list = [];
+        var i;
+        for (i = 0; i < sessions.length; i++) {
+          var s = sessions[i];
+          if (!s || s.is_cancelled) continue;
+          var start = f1ParseIso(s.date_start);
+          var end = f1ParseIso(s.date_end);
+          if (!start || !end) continue;
+          list.push({
+            raw: s,
+            tag: f1OpenF1Tag(s),
+            start: start,
+            startMs: start.getTime(),
+            endMs: end.getTime()
+          });
+        }
+        list.sort(function (a, b) { return a.startMs - b.startMs; });
+        var completed = null;
+        var live = null;
+        var upcoming = null;
+        for (i = 0; i < list.length; i++) {
+          var item = list[i];
+          if (item.endMs < now) completed = item;
+          else if (item.startMs <= now && item.endMs > now) live = item;
+          else if (item.startMs > now && !upcoming) upcoming = item;
+        }
+        var resultKey = completed && completed.raw.session_key;
+        var resultP = resultKey != null
+          ? fetchOpenF1Json('/session_result?session_key=' + encodeURIComponent(resultKey))
+          : Promise.resolve(null);
+        return resultP.then(function (results) {
+          var driversP = (resultKey != null && results)
+            ? fetchOpenF1Json('/drivers?session_key=' + encodeURIComponent(resultKey))
+            : Promise.resolve(null);
+          return driversP.then(function (drivers) {
+            var out = cards.slice();
+            var href = (cards[0] && cards[0].url) || '';
+            var meta = (cfg && cfg.meta) || 'Live · race weekend';
+            var cmo = (cfg && cfg.cmo) || {};
+            if (completed && results && results.length) {
+              var line = f1Top3Line(results, drivers);
+              if (line) {
+                out[1] = {
+                  tag: completed.tag,
+                  headline: line,
+                  snippet: completed.tag + ' result · OpenF1 historical',
+                  meta: meta,
+                  url: href
+                };
+              }
+            }
+            var stateCard;
+            if (live) {
+              stateCard = {
+                tag: 'Live',
+                headline: live.tag + ' is on',
+                snippet: live.tag + ' is on · ' + f1FormatLocal(live.start),
+                meta: meta,
+                url: href
+              };
+            } else if (upcoming) {
+              stateCard = {
+                tag: 'Next',
+                headline: cmo.state || 'Next up',
+                snippet: upcoming.tag + ' · ' + f1FormatLocal(upcoming.start),
+                meta: meta,
+                url: href
+              };
+            } else {
+              var finished = !!(completed && !live && !upcoming);
+              var snip = cmo.next
+                ? cmo.next
+                : (finished ? 'This race is in the books.' : ((out[2] && out[2].snippet) || 'Race weekend'));
+              stateCard = {
+                tag: finished ? 'Finished' : ((out[2] && out[2].tag) || 'Next'),
+                headline: finished ? 'Just finished' : (cmo.state || (out[2] && out[2].headline) || 'Next up'),
+                snippet: snip,
+                meta: meta,
+                url: href
+              };
+            }
+            if (out.length >= 3) out[2] = stateCard;
+            else out.push(stateCard);
+            return out;
+          });
+        });
+      });
+    }).catch(function () {
+      return cards;
+    });
+  }
+
   function fetchF1Cards() {
     var cfg = railCfg();
     var nextUrl = cfg.endpoint || 'https://api.jolpi.ca/ergast/f1/current/next.json';
@@ -1292,7 +1554,7 @@
       return fromLast().catch(function () { throw err; });
     }).then(function (cards) {
       if (!cards || !cards.length) throw new Error('jolpica empty');
-      return cards;
+      return overlayOpenF1Cards(cards, cfg);
     });
   }
 
@@ -1316,7 +1578,9 @@
     return porchOn ? Math.max(1, max - 1) : max;
   }
 
-  function renderTrends() {
+  var f1RefreshTimer = null;
+
+  function renderTrends(quiet) {
     var liveFetch = null;
     if (railUsesCwf()) liveFetch = fetchCwfCards;
     else if (railKind() === 'bart-bsa') liveFetch = fetchBartCards;
@@ -1326,7 +1590,7 @@
       paintRail(outboundCards().slice(0, railNwsSlots()));
       return;
     }
-    paintRail([]);
+    if (!quiet) paintRail([]);
     liveFetch().then(function (cards) {
       var extra = outboundCards();
       var merged = (cards || []).concat(extra);
@@ -1336,6 +1600,11 @@
       console.warn(railKind() || 'rail', err);
       paintRail(fallbackTrendCards());
     });
+    if (railKind() === 'f1-calendar' && !f1RefreshTimer) {
+      f1RefreshTimer = setInterval(function () {
+        renderTrends(true);
+      }, 5 * 60 * 1000);
+    }
   }
 
   function porchLine(option) {
@@ -1421,19 +1690,464 @@
     }
   }
 
+  function dmSiteId() {
+    return SITE_ID || 'gpchat';
+  }
+  function convIdFor(uidA, uidB) {
+    return dmSiteId() + '__' + [String(uidA || ''), String(uidB || '')].sort().join('_');
+  }
+  function findConv(cid) {
+    for (var i = 0; i < dmConversations.length; i++) if (dmConversations[i].id === cid) return dmConversations[i];
+    return null;
+  }
+  function convPeerUid(conv) {
+    var me = liveUid();
+    var parts = (conv && conv.participants) || [];
+    for (var i = 0; i < parts.length; i++) if (parts[i] && parts[i] !== me) return parts[i];
+    if (pendingPeer && pendingPeer.uid) return pendingPeer.uid;
+    return '';
+  }
+  function convPeerName(conv) {
+    var uid = convPeerUid(conv);
+    var names = (conv && conv.participantNames) || {};
+    if (names[uid] && String(names[uid]).indexOf('@') === -1) return names[uid];
+    if (pendingPeer && pendingPeer.uid === uid && pendingPeer.name) return pendingPeer.name;
+    return 'Member';
+  }
+  function dmDisplayName(raw) {
+    var n = String(raw || '').trim();
+    if (!n || looksLikeUid(n) || n.indexOf('@') !== -1) return 'Member';
+    return n;
+  }
+  function myDisplayName() {
+    return dmDisplayName((currentUser && currentUser.name) || (fbAuth && fbAuth.currentUser && fbAuth.currentUser.displayName) || 'Member');
+  }
+
+  function ensureDmCss() {
+    if (document.getElementById('dm-css')) return;
+    var st = document.createElement('style');
+    st.id = 'dm-css';
+    st.textContent =
+      '.post-name-link{cursor:pointer;}' +
+      '.post-name-link:hover{text-decoration:underline;}' +
+      '.thread-unread{display:inline-block;margin-left:0.35rem;min-width:1.1rem;padding:0.05rem 0.35rem;border-radius:999px;background:var(--accent,#e10600);color:#fff;font-size:0.68rem;font-weight:700;text-align:center;}' +
+      '#chat-compose-err{padding:0.35rem 1rem 0;font-size:0.8rem;color:var(--accent,#e10600);}' +
+      '.chat-user-picker{position:absolute;inset:12px;z-index:4;background:var(--surface,#1c1c20);border:1px solid var(--border,#2c2c32);border-radius:12px;display:flex;flex-direction:column;overflow:hidden;}' +
+      '.chat-user-picker[hidden]{display:none!important;}' +
+      '.chat-user-picker-head{display:flex;align-items:center;justify-content:space-between;padding:0.85rem 1rem;border-bottom:1px solid var(--border,#2c2c32);font-weight:700;}' +
+      '.chat-user-picker-head button{background:none;border:0;color:inherit;font-size:1.2rem;cursor:pointer;}' +
+      '.chat-picker-item{display:flex;gap:0.7rem;align-items:center;padding:0.75rem 1rem;cursor:pointer;border-bottom:1px solid var(--border,#2c2c32);}' +
+      '.chat-picker-item:hover{background:rgba(225,6,0,0.08);}' +
+      '#chat-thread-view[hidden],#chat-placeholder[hidden],#chat-user-picker[hidden],#profile-message-btn[hidden]{display:none!important;}';
+    document.head.appendChild(st);
+  }
+
+  function teardownDms() {
+    if (convsUnsub) { convsUnsub(); convsUnsub = null; }
+    if (msgsUnsub) { msgsUnsub(); msgsUnsub = null; }
+    dmConversations = [];
+    activeConvId = null;
+    pendingPeer = null;
+  }
+
+  function listenConversations() {
+    if (convsUnsub) { convsUnsub(); convsUnsub = null; }
+    if (!dmsOn() || !fbDb || !isLiveUser()) {
+      dmConversations = [];
+      renderThreads();
+      syncChatChrome();
+      return;
+    }
+    convsUnsub = fbDb.collection('conversations')
+      .where('siteId', '==', dmSiteId())
+      .where('participants', 'array-contains', liveUid())
+      .orderBy('lastMessageAt', 'desc')
+      .onSnapshot(function (snap) {
+        dmConversations = snap.docs.map(function (doc) {
+          var d = doc.data() || {};
+          return {
+            id: doc.id,
+            participants: d.participants || [],
+            participantNames: d.participantNames || {},
+            lastMessage: d.lastMessage || '',
+            lastMessageAt: d.lastMessageAt,
+            lastMessageBy: d.lastMessageBy || '',
+            unreadCounts: d.unreadCounts || {}
+          };
+        });
+        renderThreads();
+        syncChatChrome();
+      }, function (err) {
+        console.warn('conversations', err);
+        chatErr((err && err.message) ? err.message : 'Could not load chats.');
+        renderThreads();
+      });
+  }
+
+  function chatErr(msg) {
+    var el = document.getElementById('chat-compose-err');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'chat-compose-err';
+      el.setAttribute('role', 'status');
+      var compose = document.querySelector('#chat-thread-view .chat-compose');
+      if (compose && compose.parentNode) compose.parentNode.insertBefore(el, compose);
+      else return;
+    }
+    el.textContent = msg || '';
+  }
+
+  function paintChatPlaceholder() {
+    var title = document.querySelector('#chat-placeholder .chat-placeholder-title');
+    var sub = document.querySelector('#chat-placeholder .chat-placeholder-sub');
+    var ph = document.getElementById('chat-placeholder');
+    var view = document.getElementById('chat-thread-view');
+    if (!dmsOn()) {
+      if (title) title.textContent = 'Chat — Soon';
+      if (sub) sub.textContent = 'Direct messages are not live in this preview. No DMs graph. Sample thread copy in site.json is not a real inbox.';
+      if (ph) ph.hidden = false;
+      if (view) view.hidden = true;
+      return;
+    }
+    if (activeConvId) {
+      if (ph) ph.hidden = true;
+      if (view) view.hidden = false;
+      return;
+    }
+    if (ph) ph.hidden = false;
+    if (view) view.hidden = true;
+    if (!isLiveUser()) {
+      if (title) title.textContent = 'Join to chat';
+      if (sub) sub.textContent = 'Sign in to send and receive direct messages. Guest cannot chat.';
+    } else if (!dmConversations.length) {
+      if (title) title.textContent = 'No messages yet';
+      if (sub) sub.textContent = 'Start a DM from another user\'s profile.';
+    } else {
+      if (title) title.textContent = 'Chat';
+      if (sub) sub.textContent = 'Pick a conversation.';
+    }
+  }
+
+  function syncChatChrome() {
+    var newBtn = document.getElementById('chat-new-btn');
+    var phNew = document.getElementById('chat-placeholder-new');
+    var sendBtn = document.getElementById('chat-send-btn');
+    var input = document.getElementById('chat-compose-input');
+    var admin = dmsOn() && isLiveUser() && liveUid() === ADMIN_UID;
+    var threadOpen = !!activeConvId;
+    var peer = pendingPeer && pendingPeer.uid ? pendingPeer.uid : (findConv(activeConvId) ? convPeerUid(findConv(activeConvId)) : '');
+    var blocked = !!(peer && blockedUids[peer]);
+
+    if (newBtn) {
+      if (!dmsOn()) {
+        newBtn.hidden = false;
+        newBtn.disabled = true;
+        newBtn.textContent = 'Soon';
+        newBtn.title = 'DMs coming soon';
+      } else if (admin) {
+        newBtn.hidden = false;
+        newBtn.disabled = false;
+        newBtn.textContent = 'New';
+        newBtn.title = 'New message';
+      } else {
+        newBtn.hidden = true;
+      }
+    }
+    if (phNew) {
+      if (!dmsOn()) {
+        phNew.hidden = false;
+        phNew.disabled = true;
+        phNew.textContent = 'Soon';
+      } else if (!isLiveUser()) {
+        phNew.hidden = false;
+        phNew.disabled = false;
+        phNew.textContent = 'Join';
+      } else if (admin && !threadOpen) {
+        phNew.hidden = false;
+        phNew.disabled = false;
+        phNew.textContent = 'New';
+      } else {
+        phNew.hidden = true;
+      }
+    }
+    if (sendBtn) {
+      if (!dmsOn()) {
+        sendBtn.disabled = true;
+        sendBtn.textContent = 'Soon';
+      } else {
+        sendBtn.textContent = 'Send';
+        sendBtn.disabled = !(dmsOn() && isLiveUser() && threadOpen) || blocked;
+      }
+    }
+    if (input) {
+      input.maxLength = DM_TEXT_MAX;
+      input.disabled = !dmsOn() || !isLiveUser() || !threadOpen || blocked;
+    }
+    if (blocked && threadOpen) chatErr('You blocked this user.');
+    else if (!blocked) chatErr('');
+    paintChatPlaceholder();
+  }
+
   function renderThreads() {
     const el = document.getElementById('chat-thread-list');
     if (!el) return;
-    el.innerHTML = '<div class="soon-panel soon-panel-pad">' +
-      '<strong>Chat — Soon.</strong>' +
-      '<p>Direct messages are not live. Sample thread copy in site.json is not a real inbox.</p>' +
-      '</div>';
+    if (!dmsOn()) {
+      el.innerHTML = '<div class="soon-panel soon-panel-pad">' +
+        '<strong>Chat — Soon.</strong>' +
+        '<p>Direct messages are not live. Sample thread copy in site.json is not a real inbox.</p>' +
+        '</div>';
+      return;
+    }
+    if (!isLiveUser()) {
+      el.innerHTML = '<div class="soon-panel soon-panel-pad">' +
+        '<strong>Join to chat.</strong>' +
+        '<p>Sign in to send and receive direct messages. Guest cannot chat.</p>' +
+        '</div>';
+      return;
+    }
+    var q = ((document.getElementById('chat-search-input') || {}).value || '').trim().toLowerCase();
+    var list = dmConversations.filter(function (c) {
+      if (!q) return true;
+      var name = String(convPeerName(c) || '').toLowerCase();
+      var prev = String(c.lastMessage || '').toLowerCase();
+      return name.indexOf(q) !== -1 || prev.indexOf(q) !== -1;
+    });
+    if (!list.length) {
+      el.innerHTML = '<div class="soon-panel soon-panel-pad">' +
+        '<strong>' + (dmConversations.length ? 'No matches.' : 'No messages yet.') + '</strong>' +
+        '</div>';
+      return;
+    }
+    var me = liveUid();
+    el.innerHTML = list.map(function (c) {
+      var name = convPeerName(c);
+      var unread = (c.unreadCounts && me && c.unreadCounts[me]) || 0;
+      var handle = String(name).toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 15) || 'member';
+      return '<div class="chat-thread-item' + (c.id === activeConvId ? ' active' : '') + '" data-cid="' + escapeHtml(c.id) + '">' +
+        '<div class="post-avatar" style="background:' + colorFor(handle) + '">' + initials(name) + '</div>' +
+        '<div><div class="thread-name">' + escapeHtml(name) +
+          (unread ? '<span class="thread-unread">' + escapeHtml(String(unread)) + '</span>' : '') +
+        '</div><div class="thread-preview">' + escapeHtml(c.lastMessage || '') + '</div></div></div>';
+    }).join('');
+  }
+
+  function markRead(cid) {
+    if (!fbDb || !cid || !liveUid() || !dmsOn()) return;
+    var me = liveUid();
+    var conv = findConv(cid);
+    if (conv && conv.unreadCounts && !conv.unreadCounts[me]) return;
+    var patch = {};
+    patch['unreadCounts.' + me] = 0;
+    fbDb.collection('conversations').doc(cid).update(patch).catch(function () {});
+  }
+
+  function listenMessages(cid) {
+    if (msgsUnsub) { msgsUnsub(); msgsUnsub = null; }
+    var el = document.getElementById('chat-messages');
+    if (!dmsOn() || !fbDb || !cid || !isLiveUser()) {
+      if (el) el.innerHTML = '';
+      return;
+    }
+    msgsUnsub = fbDb.collection('conversations').doc(cid).collection('messages')
+      .orderBy('createdAt', 'asc')
+      .onSnapshot(function (snap) {
+        var me = liveUid();
+        if (el) {
+          el.innerHTML = snap.docs.map(function (doc) {
+            var d = doc.data() || {};
+            return '<div class="chat-bubble ' + (d.fromUid === me ? 'me' : 'them') + '">' + escapeHtml(d.text || '') + '</div>';
+          }).join('');
+          el.scrollTop = el.scrollHeight;
+        }
+        markRead(cid);
+      }, function (err) {
+        console.warn('messages', err);
+        chatErr((err && err.message) ? err.message : 'Could not load messages.');
+      });
+  }
+
+  function openThread(cid, opts) {
+    opts = opts || {};
+    if (!dmsOn() || !cid) return;
+    activeConvId = cid;
+    var conv = findConv(cid);
+    var peerUid = (pendingPeer && pendingPeer.uid) || (conv && convPeerUid(conv)) || '';
+    if (peerUid && (!pendingPeer || pendingPeer.uid !== peerUid)) {
+      pendingPeer = { uid: peerUid, name: opts.name || (conv && convPeerName(conv)) || 'Member' };
+    }
+    var nameEl = document.getElementById('chat-active-name');
+    if (nameEl) nameEl.textContent = opts.name || (conv ? convPeerName(conv) : (pendingPeer && pendingPeer.name) || 'Chat');
+    var overlay = document.getElementById('chat-overlay');
+    if (overlay) overlay.classList.add('thread-open');
+    syncChatChrome();
+    renderThreads();
+    listenMessages(cid);
+    markRead(cid);
+  }
+
+  function startDm(otherUid, otherName) {
+    if (!dmsOn()) return;
+    if (!isLiveUser()) { openAuth('join'); return; }
+    if (!requireVerified('chat')) return;
+    otherUid = String(otherUid || '');
+    if (!otherUid || otherUid === liveUid()) return;
+    if (blockedUids[otherUid]) {
+      chatErr('You blocked this user.');
+      return;
+    }
+    pendingPeer = { uid: otherUid, name: dmDisplayName(otherName) };
+    if (routeFromHash() !== 'chat') go('chat');
+    else openChat();
+    openThread(convIdFor(liveUid(), otherUid), { name: pendingPeer.name });
+  }
+
+  function sendDm() {
+    if (!dmsOn()) return;
+    if (!requireVerified('chat')) return;
+    var input = document.getElementById('chat-compose-input');
+    var text = ((input && input.value) || '').replace(/\s+/g, ' ').trim();
+    if (!text) return;
+    if (text.length > DM_TEXT_MAX) text = text.slice(0, DM_TEXT_MAX);
+    var me = liveUid();
+    var conv = findConv(activeConvId);
+    var other = (pendingPeer && pendingPeer.uid) || (conv && convPeerUid(conv)) || '';
+    if (!me || !other || other === me) return;
+    if (blockedUids[other]) {
+      chatErr('You blocked this user.');
+      return;
+    }
+    if (!fbDb) { chatErr('Chat is not connected.'); return; }
+    var peerName = dmDisplayName((pendingPeer && pendingPeer.name) || (conv && convPeerName(conv)) || 'Member');
+    var myName = myDisplayName();
+    var cid = convIdFor(me, other);
+    var convRef = fbDb.collection('conversations').doc(cid);
+    var msgRef = convRef.collection('messages').doc();
+    var sendBtn = document.getElementById('chat-send-btn');
+    if (sendBtn) sendBtn.disabled = true;
+    chatErr('');
+    fbDb.runTransaction(function (transaction) {
+      return transaction.get(convRef).then(function (snap) {
+        var names = {};
+        names[me] = myName;
+        names[other] = peerName;
+        var unread = {};
+        unread[me] = 0;
+        unread[other] = 1;
+        if (snap.exists) {
+          var d = snap.data() || {};
+          var existingNames = d.participantNames || {};
+          names[me] = myName || dmDisplayName(existingNames[me]);
+          names[other] = dmDisplayName(existingNames[other]) !== 'Member' ? dmDisplayName(existingNames[other]) : peerName;
+          var prev = d.unreadCounts || {};
+          unread[other] = (typeof prev[other] === 'number' ? prev[other] : 0) + 1;
+          transaction.update(convRef, {
+            lastMessage: text,
+            lastMessageAt: firebase.firestore.FieldValue.serverTimestamp(),
+            lastMessageBy: me,
+            unreadCounts: unread,
+            participantNames: names
+          });
+        } else {
+          transaction.set(convRef, {
+            siteId: dmSiteId(),
+            participants: [me, other],
+            participantNames: names,
+            lastMessage: text,
+            lastMessageAt: firebase.firestore.FieldValue.serverTimestamp(),
+            lastMessageBy: me,
+            unreadCounts: unread,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        }
+        transaction.set(msgRef, {
+          fromUid: me,
+          text: text,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          siteId: dmSiteId()
+        });
+      });
+    }).then(function () {
+      if (input) {
+        input.value = '';
+        input.style.height = 'auto';
+      }
+      activeConvId = cid;
+      listenMessages(cid);
+      syncChatChrome();
+    }).catch(function (e) {
+      chatErr((e && e.message) ? e.message : 'Could not send.');
+      syncChatChrome();
+    });
+  }
+
+  function hideDmPicker() {
+    var el = document.getElementById('chat-user-picker');
+    if (el) el.hidden = true;
+  }
+
+  function openAdminPicker() {
+    if (!dmsOn()) {
+      chatErr('Chat is not enabled on this room.');
+      return;
+    }
+    if (liveUid() !== ADMIN_UID) {
+      chatErr('Welcome sends need the factory admin Google (jebb.dykstra@gmail.com). This signed-in account is not that admin.');
+      return;
+    }
+    if (!requireVerified('chat')) return;
+    if (!fbDb) { chatErr('Chat is not connected.'); return; }
+    ensureDmCss();
+    var picker = document.getElementById('chat-user-picker');
+    if (!picker) {
+      picker = document.createElement('div');
+      picker.id = 'chat-user-picker';
+      picker.className = 'chat-user-picker';
+      picker.innerHTML = '<div class="chat-user-picker-head">New message<button type="button" id="chat-picker-close" aria-label="Close">×</button></div><div id="chat-picker-list"></div>';
+      var overlay = document.getElementById('chat-overlay');
+      if (overlay) overlay.appendChild(picker);
+    }
+    var list = document.getElementById('chat-picker-list');
+    if (list) list.innerHTML = '<div class="soon-panel">Loading…</div>';
+    picker.hidden = false;
+    fbDb.collection('users').where('siteId', '==', dmSiteId()).limit(80).get().then(function (snap) {
+      var me = liveUid();
+      var rows = [];
+      snap.forEach(function (doc) {
+        if (doc.id === me) return;
+        var d = doc.data() || {};
+        var name = dmDisplayName(d.displayName);
+        rows.push({ uid: doc.id, name: name });
+      });
+      rows.sort(function (a, b) { return a.name.localeCompare(b.name); });
+      if (!list) return;
+      if (!rows.length) {
+        list.innerHTML = '<div class="soon-panel">No gpchat users yet.</div>';
+        return;
+      }
+      list.innerHTML = rows.map(function (u) {
+        var handle = String(u.name).toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 15) || 'member';
+        return '<div class="chat-picker-item" data-pick-uid="' + escapeHtml(u.uid) + '" data-pick-name="' + escapeHtml(u.name) + '">' +
+          '<div class="post-avatar" style="background:' + colorFor(handle) + '">' + initials(u.name) + '</div>' +
+          '<div class="thread-name">' + escapeHtml(u.name) + '</div></div>';
+      }).join('');
+    }).catch(function (e) {
+      if (list) list.innerHTML = '<div class="soon-panel">' + escapeHtml((e && e.message) || 'Could not list users.') + '</div>';
+    });
+  }
+
+  function onChatNew() {
+    if (!dmsOn()) return;
+    if (!isLiveUser()) { openAuth('join'); return; }
+    if (liveUid() === ADMIN_UID) openAdminPicker();
   }
 
   function openChat() {
     closeSocialOverlays();
+    hideDmPicker();
     document.getElementById('chat-overlay').classList.add('active');
     highlightSocial('chat');
+    syncChatChrome();
+    renderThreads();
   }
   function openNotif() {
     closeSocialOverlays();
@@ -1446,15 +2160,70 @@
     highlightSocial('explore');
   }
   function openProfile() {
+    viewingProfile = null;
     closeSocialOverlays();
     document.getElementById('profile-overlay').classList.add('active');
     highlightSocial('profile');
     syncProfile();
   }
 
+  function openUserProfile(uid, name, handle) {
+    if (!uid) return;
+    if (liveUid() && uid === liveUid()) { openProfile(); return; }
+    viewingProfile = {
+      uid: uid,
+      name: dmDisplayName(name),
+      handle: String(handle || name || 'member').toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 15) || 'member'
+    };
+    closeSocialOverlays();
+    document.getElementById('profile-overlay').classList.add('active');
+    highlightSocial('profile');
+    syncProfile();
+  }
+
+  function paintProfile(name, handle, bio, uid) {
+    var top = document.getElementById('profile-topbar-name');
+    if (top) top.textContent = name;
+    var dn = document.getElementById('profile-display-name');
+    if (dn) dn.textContent = name;
+    var h = document.getElementById('profile-handle');
+    if (h) h.textContent = '@' + handle;
+    var av = document.getElementById('profile-avatar');
+    if (av) av.textContent = initials(name);
+    var b = document.getElementById('profile-bio');
+    if (b) b.textContent = bio || '';
+    const pane = document.getElementById('profile-pane-posts');
+    if (!pane) return;
+    const mine = livePosts.filter(function (p) { return p.authorUid && p.authorUid === uid; });
+    if (!mine.length) {
+      pane.innerHTML = '<div class="empty-note" id="profile-posts-empty">No posts yet. Hit Post when something about the city is on your mind.</div>';
+    } else {
+      pane.innerHTML = mine.map(function (p) { return renderPost(p, !!p.parentId); }).join('');
+    }
+  }
+
   function syncProfile() {
     const prompt = document.getElementById('profile-signin-prompt');
     const content = document.getElementById('profile-content');
+    var editBtn = document.getElementById('profile-edit-btn');
+    var msgBtn = document.getElementById('profile-message-btn');
+    var other = viewingProfile && viewingProfile.uid && viewingProfile.uid !== liveUid();
+
+    if (other) {
+      if (prompt) prompt.hidden = true;
+      if (content) content.hidden = false;
+      if (editBtn) editBtn.hidden = true;
+      if (msgBtn) {
+        msgBtn.hidden = !dmsOn();
+        msgBtn.disabled = false;
+      }
+      paintProfile(viewingProfile.name || 'Member', viewingProfile.handle || 'member', '', viewingProfile.uid);
+      return;
+    }
+
+    if (msgBtn) msgBtn.hidden = true;
+    if (editBtn) editBtn.hidden = false;
+
     if (!isLiveUser() || !currentUser || !currentUser.live) {
       if (prompt) prompt.hidden = false;
       if (content) content.hidden = true;
@@ -1464,19 +2233,12 @@
     }
     if (prompt) prompt.hidden = true;
     if (content) content.hidden = false;
-    document.getElementById('profile-topbar-name').textContent = currentUser.name;
-    document.getElementById('profile-display-name').textContent = currentUser.name;
-    document.getElementById('profile-handle').textContent = '@' + currentUser.handle;
-    document.getElementById('profile-avatar').textContent = initials(currentUser.name);
-    document.getElementById('profile-bio').textContent = currentUser.bio || "Talking about the city.";
-    const mine = livePosts.filter(function (p) { return p.authorUid && p.authorUid === currentUser.uid; });
-    const pane = document.getElementById('profile-pane-posts');
-    if (!pane) return;
-    if (!mine.length) {
-      pane.innerHTML = '<div class="empty-note" id="profile-posts-empty">No posts yet. Hit Post when something about the city is on your mind.</div>';
-    } else {
-      pane.innerHTML = mine.map(function (p) { return renderPost(p, !!p.parentId); }).join('');
-    }
+    paintProfile(
+      currentUser.name,
+      currentUser.handle,
+      currentUser.bio || "Talking about the city.",
+      currentUser.uid
+    );
   }
 
   function renderSidebarAuth() {
@@ -1704,6 +2466,7 @@
     closeAuth();
     renderSidebarAuth();
     hideDummyChrome();
+    syncChatChrome();
     syncProfile();
     restoreCompose(draft);
   }
@@ -1713,6 +2476,8 @@
     saveJSON(LS_USER, null);
     renderSidebarAuth();
     hideDummyChrome();
+    teardownDms();
+    listenConversations();
     syncProfile();
     renderFeed();
   }
@@ -2160,6 +2925,40 @@
       }
       if (e.target.closest('#auth-signout')) { signOut(); return; }
 
+      if (e.target.closest('#profile-message-btn')) {
+        if (!dmsOn()) return;
+        if (!isLiveUser()) { openAuth('join'); return; }
+        if (viewingProfile && viewingProfile.uid) startDm(viewingProfile.uid, viewingProfile.name);
+        return;
+      }
+      const profileWho = e.target.closest('[data-profile-uid]');
+      if (profileWho && dmsOn() && !e.target.closest('[data-act]')) {
+        e.preventDefault();
+        openUserProfile(
+          profileWho.getAttribute('data-profile-uid'),
+          profileWho.getAttribute('data-profile-name'),
+          profileWho.getAttribute('data-profile-handle')
+        );
+        return;
+      }
+      const threadItem = e.target.closest('[data-cid]');
+      if (threadItem && dmsOn()) {
+        var opened = findConv(threadItem.getAttribute('data-cid'));
+        pendingPeer = opened ? { uid: convPeerUid(opened), name: convPeerName(opened) } : pendingPeer;
+        openThread(threadItem.getAttribute('data-cid'));
+        return;
+      }
+      const pickItem = e.target.closest('[data-pick-uid]');
+      if (pickItem) {
+        hideDmPicker();
+        startDm(pickItem.getAttribute('data-pick-uid'), pickItem.getAttribute('data-pick-name'));
+        return;
+      }
+      if (e.target.closest('#chat-picker-close')) {
+        hideDmPicker();
+        return;
+      }
+
       const porchBtn = e.target.closest('[data-porch]');
       if (porchBtn) {
         e.preventDefault();
@@ -2245,6 +3044,8 @@
 
     document.addEventListener('keydown', function (e) {
       if (e.key !== 'Escape') return;
+      const picker = document.getElementById('chat-user-picker');
+      if (picker && !picker.hidden) { e.preventDefault(); hideDmPicker(); return; }
       const shareOv = document.getElementById('share-sheet');
       if (shareOv && !shareOv.hidden) { e.preventDefault(); closeShareSheet(); return; }
       const ov = document.getElementById('cv-auth-overlay');
@@ -2278,11 +3079,22 @@
     if (markRead) markRead.addEventListener('click', function () { /* soon: no live notifs */ });
 
     var chatNew = document.getElementById('chat-new-btn');
-    if (chatNew) chatNew.addEventListener('click', function () { /* soon */ });
+    if (chatNew) chatNew.addEventListener('click', onChatNew);
     var chatPlaceholderNew = document.getElementById('chat-placeholder-new');
-    if (chatPlaceholderNew) chatPlaceholderNew.addEventListener('click', function () { /* soon */ });
+    if (chatPlaceholderNew) chatPlaceholderNew.addEventListener('click', onChatNew);
     var chatSend = document.getElementById('chat-send-btn');
-    if (chatSend) chatSend.addEventListener('click', function () { /* soon: no live DMs */ });
+    if (chatSend) chatSend.addEventListener('click', sendDm);
+    var chatInput = document.getElementById('chat-compose-input');
+    if (chatInput) {
+      chatInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          sendDm();
+        }
+      });
+    }
+    var chatSearch = document.getElementById('chat-search-input');
+    if (chatSearch) chatSearch.addEventListener('input', renderThreads);
 
     document.getElementById('profile-edit-btn').addEventListener('click', function () {
       openAuth('register');
@@ -2438,7 +3250,9 @@
     applyTheme(site.theme);
     applySiteChrome();
     ensureJoinAuthLayout();
+    ensureDmCss();
     hideDummyChrome();
+    syncChatChrome();
 
     if (fbAuth) {
       fbAuth.getRedirectResult().then(function (cred) {
@@ -2462,6 +3276,8 @@
             saveJSON(LS_USER, null);
             renderSidebarAuth();
             hideDummyChrome();
+            teardownDms();
+            listenConversations();
             syncProfile();
             renderFeed();
           }
