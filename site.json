@@ -368,7 +368,8 @@
       "options": [
         "Blessing",
         "Question"
-      ]
+      ],
+      "dwellMs": 9000
     }
   }
 }
