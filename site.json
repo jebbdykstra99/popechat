@@ -131,6 +131,11 @@
       "snippet": "We are a dress rehearsal. They have a press office."
     }
   ],
+  "stories": {
+    "enabled": true,
+    "maxSeconds": 15,
+    "maxBytes": 8000000
+  },
   "seedNote": "sample — not mixed into the live feed",
   "seed": [
     {
