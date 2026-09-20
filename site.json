@@ -137,55 +137,60 @@
       "label": "Mass reflection",
       "parent": null,
       "kind": "prayer",
-      "blurb": "Liturgy-of-the-word / prayer-hour reflection room. Not a valid sacramental Mass. Not official Vatican.",
+      "blurb": "Liturgy of the Word companion — mercy before spectacle. Not a valid sacramental Mass. Not official Vatican.",
       "nav": true,
       "rankings": [],
       "reviews": [],
-      "railPins": []
+      "railPins": [],
+      "emptyHelper": "A Sunday Mass reflection companion. Pastoral, not spectacle. Not a livestream Mass. Not a substitute for your parish."
     },
     {
       "slug": "vespers",
       "label": "Vespers / Evening Prayer",
       "parent": null,
       "kind": "prayer",
-      "blurb": "Evening prayer hour. Community prayer framing only — not a liturgical celebration of Mass. Not official Vatican.",
+      "blurb": "Evening Prayer for the weary. Thanksgiving and rest. Not Mass online. Not official Vatican.",
       "nav": true,
       "rankings": [],
       "reviews": [],
-      "railPins": []
+      "railPins": [],
+      "emptyHelper": "Evening Prayer for the weary. Sat eve and Sunday close."
     },
     {
       "slug": "intentions",
       "label": "Prayer intentions",
       "parent": null,
       "kind": "prayer",
-      "blurb": "Share prayer intentions. Preview room — not official Vatican, not a parish office.",
+      "blurb": "An ear for anyone who needs one — downtrodden, poor, grieving, unseen. Hold names gently. Not official Vatican.",
       "nav": true,
       "rankings": [],
       "reviews": [],
-      "railPins": []
+      "railPins": [],
+      "emptyHelper": "An ear for anyone who needs one. Drop one intention. No debate theater."
     },
     {
       "slug": "meditation",
       "label": "Meditation",
       "parent": null,
       "kind": "prayer",
-      "blurb": "Quiet meditation and lectio-style reflection. Prayer-hour framing. Not official Vatican.",
+      "blurb": "Soft hour for silence. One breath prayer is enough. Come as you are. Not official Vatican.",
       "nav": true,
       "rankings": [],
       "reviews": [],
-      "railPins": []
+      "railPins": [],
+      "emptyHelper": "Silence is allowed. One line is enough. Come as you are."
     },
     {
       "slug": "hymns",
       "label": "Hymns & song",
       "parent": null,
       "kind": "prayer",
-      "blurb": "Hymns, chant, and sacred song talk. Not a live liturgy stream. Not official Vatican.",
+      "blurb": "Hymn titles that console — no lyric dumps. Mercy before performance. Not official Vatican.",
       "nav": true,
       "rankings": [],
       "reviews": [],
-      "railPins": []
+      "railPins": [],
+      "emptyHelper": "Hymn titles only — no copyrighted lyric paste. Consolation over performance."
     }
   ],
   "stories": {
@@ -413,25 +418,50 @@
   "rail": {
     "kind": "porch",
     "title": "Room Brief",
-    "kicker": "Urbi et orbi",
-    "meta": "From the source",
-    "footer": "Vatican News as a link. Not a lectionary paste. Ads off.",
+    "kicker": "Sunday nests",
+    "meta": "Mercy first",
+    "footer": "Vatican News as a link. Not a lectionary paste. Ads off. Not a substitute for your parish Mass.",
     "outbound": [
       {
+        "tag": "Sunday",
+        "topic": "nests",
+        "headline": "Sunday sacred nests — an ear for anyone who needs one",
+        "snippet": "Mass reflection · Vespers · Intentions · Meditation · Hymns. Companion only.",
+        "meta": "Mercy first",
+        "url": "https://popechat.com/intentions"
+      },
+      {
         "tag": "Vatican",
+        "topic": "vatican",
         "headline": "Vatican News",
         "snippet": "The office, the letters, from the source.",
-        "url": "https://www.vaticannews.va/en.html",
-        "meta": "Official · link-out"
+        "meta": "Official · link-out",
+        "url": "https://www.vaticannews.va/en.html"
+      },
+      {
+        "tag": "Honesty",
+        "topic": "honesty",
+        "headline": "Not a substitute for your parish Mass",
+        "snippet": "Pastoral presence, not spectacle. Not livestream Mass. No invented papal quotes.",
+        "meta": "Companion",
+        "url": "https://popechat.com/mass-reflection"
       }
     ],
     "porch": {
-      "prompt": "A blessing or a question?",
+      "topic": "porch",
+      "prompt": "Who needs an ear today?",
+      "dwellMs": 9000,
       "options": [
-        "Blessing",
-        "Question"
-      ],
-      "dwellMs": 9000
+        "Intentions",
+        "Quiet",
+        "Parish"
+      ]
+    },
+    "maxCards": 3,
+    "cmo": {
+      "title": "Sunday on popechat",
+      "state": "Mercy first",
+      "next": "An ear for anyone who needs one"
     }
   }
 }
