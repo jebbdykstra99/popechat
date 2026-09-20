@@ -131,6 +131,63 @@
       "snippet": "We are a dress rehearsal. They have a press office."
     }
   ],
+  "nests": [
+    {
+      "slug": "mass-reflection",
+      "label": "Mass reflection",
+      "parent": null,
+      "kind": "prayer",
+      "blurb": "Liturgy-of-the-word / prayer-hour reflection room. Not a valid sacramental Mass. Not official Vatican.",
+      "nav": true,
+      "rankings": [],
+      "reviews": [],
+      "railPins": []
+    },
+    {
+      "slug": "vespers",
+      "label": "Vespers / Evening Prayer",
+      "parent": null,
+      "kind": "prayer",
+      "blurb": "Evening prayer hour. Community prayer framing only — not a liturgical celebration of Mass. Not official Vatican.",
+      "nav": true,
+      "rankings": [],
+      "reviews": [],
+      "railPins": []
+    },
+    {
+      "slug": "intentions",
+      "label": "Prayer intentions",
+      "parent": null,
+      "kind": "prayer",
+      "blurb": "Share prayer intentions. Preview room — not official Vatican, not a parish office.",
+      "nav": true,
+      "rankings": [],
+      "reviews": [],
+      "railPins": []
+    },
+    {
+      "slug": "meditation",
+      "label": "Meditation",
+      "parent": null,
+      "kind": "prayer",
+      "blurb": "Quiet meditation and lectio-style reflection. Prayer-hour framing. Not official Vatican.",
+      "nav": true,
+      "rankings": [],
+      "reviews": [],
+      "railPins": []
+    },
+    {
+      "slug": "hymns",
+      "label": "Hymns & song",
+      "parent": null,
+      "kind": "prayer",
+      "blurb": "Hymns, chant, and sacred song talk. Not a live liturgy stream. Not official Vatican.",
+      "nav": true,
+      "rankings": [],
+      "reviews": [],
+      "railPins": []
+    }
+  ],
   "stories": {
     "enabled": true,
     "maxSeconds": 15,
