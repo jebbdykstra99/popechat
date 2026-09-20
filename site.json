@@ -141,8 +141,7 @@
       "nav": true,
       "rankings": [],
       "reviews": [],
-      "railPins": [],
-      "emptyHelper": "A Sunday Mass reflection companion. Pastoral, not spectacle. Not a livestream Mass. Not a substitute for your parish."
+      "railPins": []
     },
     {
       "slug": "vespers",
@@ -153,8 +152,7 @@
       "nav": true,
       "rankings": [],
       "reviews": [],
-      "railPins": [],
-      "emptyHelper": "Evening Prayer for the weary. Sat eve and Sunday close."
+      "railPins": []
     },
     {
       "slug": "intentions",
@@ -165,8 +163,7 @@
       "nav": true,
       "rankings": [],
       "reviews": [],
-      "railPins": [],
-      "emptyHelper": "An ear for anyone who needs one. Drop one intention. No debate theater."
+      "railPins": []
     },
     {
       "slug": "meditation",
@@ -177,8 +174,7 @@
       "nav": true,
       "rankings": [],
       "reviews": [],
-      "railPins": [],
-      "emptyHelper": "Silence is allowed. One line is enough. Come as you are."
+      "railPins": []
     },
     {
       "slug": "hymns",
@@ -189,8 +185,7 @@
       "nav": true,
       "rankings": [],
       "reviews": [],
-      "railPins": [],
-      "emptyHelper": "Hymn titles only — no copyrighted lyric paste. Consolation over performance."
+      "railPins": []
     }
   ],
   "stories": {
