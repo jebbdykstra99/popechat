@@ -69,56 +69,71 @@
   ],
   "places": [
     {
-      "tag": "Letter",
+      "tag": "Documents",
       "title": "Encyclicals",
-      "snippet": "Long letters to the church and anyone who will read slowly."
+      "snippet": "Long letters. Read them as letters, not as cable chyron."
     },
     {
-      "tag": "Letter",
+      "tag": "Documents",
+      "title": "Letter desk",
+      "snippet": "The office writes slowly on purpose. Argue after you read."
+    },
+    {
+      "tag": "Documents",
       "title": "Urbi et orbi",
       "snippet": "To the city and the world. A greeting, not a slogan."
     },
     {
-      "tag": "Letter",
-      "title": "The office",
-      "snippet": "The chair outlasts the man. Dummy talk, not a biography."
-    },
-    {
-      "tag": "Letter",
-      "title": "Charity",
-      "snippet": "Hospitals and bread before the argument."
-    },
-    {
-      "tag": "Letter",
+      "tag": "Documents",
       "title": "Footnotes of mercy",
-      "snippet": "Read the poor into the document. Dummy desk."
+      "snippet": "Read the poor into the document. Culture war is a bad lector."
     },
     {
-      "tag": "Letter",
+      "tag": "Documents",
+      "title": "Charity",
+      "snippet": "Hospitals and bread before the argument. Not a fundraiser seat."
+    },
+    {
+      "tag": "Documents",
       "title": "Not a homily",
-      "snippet": "This site is a room. Mass is elsewhere."
+      "snippet": "Mass is elsewhere. This is a room for talking about the letters."
+    },
+    {
+      "tag": "Documents",
+      "title": "How we cite",
+      "snippet": "Outbound to primary sources only. No anonymous “sources say.”"
     }
   ],
   "topics": [
     {
+      "tag": "Office",
+      "title": "The chair",
+      "snippet": "The office outlasts the man. Dummy biography theater stays out."
+    },
+    {
+      "tag": "Office",
+      "title": "The See",
+      "snippet": "Civic furniture of an institution. Not a personality brand."
+    },
+    {
+      "tag": "Office",
+      "title": "White smoke",
+      "snippet": "Process explained calmly. Civic knowledge, not a countdown or betting market."
+    },
+    {
+      "tag": "Office",
+      "title": "Not a sitting-name feed",
+      "snippet": "We will not invent a sitting name as live news. Talk about the chair."
+    },
+    {
       "tag": "Square",
       "title": "St. Peter’s square",
-      "snippet": "A public room with a colonnade. Dummy postcard."
-    },
-    {
-      "tag": "Square",
-      "title": "White smoke",
-      "snippet": "The process, explained calmly. Not a countdown clock."
-    },
-    {
-      "tag": "Square",
-      "title": "The Swiss and the doors",
-      "snippet": "Ceremony as civic furniture. Dummy, not a tour."
+      "snippet": "Public room, not a dunk couch."
     },
     {
       "tag": "Square",
       "title": "Pilgrims",
-      "snippet": "People who came a long way and are tired. Be kind in the thread."
+      "snippet": "People who came a long way and are tired. Benefit of the doubt."
     },
     {
       "tag": "Square",
@@ -127,70 +142,81 @@
     },
     {
       "tag": "Square",
+      "title": "Colonnade / doors",
+      "snippet": "Ceremony as civic furniture. Not a tour brochure dump."
+    },
+    {
+      "tag": "Square",
       "title": "Not official Vatican",
       "snippet": "We are a dress rehearsal. They have a press office."
+    },
+    {
+      "tag": "FACT",
+      "title": "Room Brief",
+      "snippet": "Short FACT block. Keep thin when there is no fresh sourced beat."
+    },
+    {
+      "tag": "FACT",
+      "title": "Vatican News",
+      "snippet": "Official · link-out — the office, the letters, from the source.",
+      "url": "https://www.vaticannews.va/en.html"
     }
   ],
   "nests": [
     {
       "slug": "mass-reflection",
-      "label": "Mass reflection",
+      "label": "Sunday Mass reflection",
       "parent": null,
       "kind": "prayer",
-      "blurb": "Liturgy of the Word companion — mercy before spectacle. Not a valid sacramental Mass. Not official Vatican.",
+      "blurb": "Liturgy of the Word companion — read with your parish, then talk here. Not a livestream Mass. Not a substitute for your parish. Not official Vatican.",
       "nav": true,
       "rankings": [],
       "reviews": [],
-      "railPins": [],
-      "emptyHelper": "A Sunday Mass reflection companion. Pastoral, not spectacle. Not a livestream Mass. Not a substitute for your parish."
+      "railPins": []
     },
     {
       "slug": "vespers",
-      "label": "Vespers / Evening Prayer",
+      "label": "Evening Prayer",
       "parent": null,
       "kind": "prayer",
-      "blurb": "Evening Prayer for the weary. Thanksgiving and rest. Not Mass online. Not official Vatican.",
+      "blurb": "Vespers-style quiet at day’s end — thanksgiving, examen, rest in God. Not official Vatican. Not a meme.",
       "nav": true,
       "rankings": [],
       "reviews": [],
-      "railPins": [],
-      "emptyHelper": "Evening Prayer for the weary. Sat eve and Sunday close."
+      "railPins": []
     },
     {
       "slug": "intentions",
       "label": "Prayer intentions",
       "parent": null,
       "kind": "prayer",
-      "blurb": "An ear for anyone who needs one — downtrodden, poor, grieving, unseen. Hold names gently. Not official Vatican.",
+      "blurb": "Name what you carry — people, parish, the poor, the world. Charity first. Not official Vatican.",
       "nav": true,
       "rankings": [],
       "reviews": [],
-      "railPins": [],
-      "emptyHelper": "An ear for anyone who needs one. Drop one intention. No debate theater."
+      "railPins": []
     },
     {
       "slug": "meditation",
-      "label": "Meditation",
+      "label": "Quiet meditation",
       "parent": null,
       "kind": "prayer",
-      "blurb": "Soft hour for silence. One breath prayer is enough. Come as you are. Not official Vatican.",
+      "blurb": "Stillness hour — short breath prayer, no argument. Not official Vatican.",
       "nav": true,
       "rankings": [],
       "reviews": [],
-      "railPins": [],
-      "emptyHelper": "Silence is allowed. One line is enough. Come as you are."
+      "railPins": []
     },
     {
       "slug": "hymns",
       "label": "Hymns & song",
       "parent": null,
       "kind": "prayer",
-      "blurb": "Hymn titles that console — no lyric dumps. Mercy before performance. Not official Vatican.",
+      "blurb": "Sing at home or parish — titles and why they help; no lyric dumps. Not official Vatican.",
       "nav": true,
       "rankings": [],
       "reviews": [],
-      "railPins": [],
-      "emptyHelper": "Hymn titles only — no copyrighted lyric paste. Consolation over performance."
+      "railPins": []
     }
   ],
   "stories": {
@@ -418,50 +444,25 @@
   "rail": {
     "kind": "porch",
     "title": "Room Brief",
-    "kicker": "Sunday nests",
-    "meta": "Mercy first",
-    "footer": "Vatican News as a link. Not a lectionary paste. Ads off. Not a substitute for your parish Mass.",
+    "kicker": "Urbi et orbi",
+    "meta": "From the source",
+    "footer": "Vatican News as a link. Not a lectionary paste. Ads off. Not official Vatican. Not a meme.",
     "outbound": [
       {
-        "tag": "Sunday",
-        "topic": "nests",
-        "headline": "Sunday sacred nests — an ear for anyone who needs one",
-        "snippet": "Mass reflection · Vespers · Intentions · Meditation · Hymns. Companion only.",
-        "meta": "Mercy first",
-        "url": "https://popechat.com/intentions"
-      },
-      {
         "tag": "Vatican",
-        "topic": "vatican",
         "headline": "Vatican News",
         "snippet": "The office, the letters, from the source.",
-        "meta": "Official · link-out",
-        "url": "https://www.vaticannews.va/en.html"
-      },
-      {
-        "tag": "Honesty",
-        "topic": "honesty",
-        "headline": "Not a substitute for your parish Mass",
-        "snippet": "Pastoral presence, not spectacle. Not livestream Mass. No invented papal quotes.",
-        "meta": "Companion",
-        "url": "https://popechat.com/mass-reflection"
+        "url": "https://www.vaticannews.va/en.html",
+        "meta": "Official · link-out"
       }
     ],
     "porch": {
-      "topic": "porch",
-      "prompt": "Who needs an ear today?",
-      "dwellMs": 9000,
+      "prompt": "A blessing or a question?",
       "options": [
-        "Intentions",
-        "Quiet",
-        "Parish"
-      ]
-    },
-    "maxCards": 3,
-    "cmo": {
-      "title": "Sunday on popechat",
-      "state": "Mercy first",
-      "next": "An ear for anyone who needs one"
+        "Blessing",
+        "Question"
+      ],
+      "dwellMs": 9000
     }
   }
 }
