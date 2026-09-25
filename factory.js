@@ -18,9 +18,19 @@
   var nestVoice = {
     mode: '',
     slug: '',
-    utterance: null,
     audio: null,
-    keep: null,
+    source: null,
+    speakAudio: null,
+    speakUrl: null,
+    ctx: null,
+    clips: {},
+    engine: null,
+    enginePromise: null,
+    onProgress: null,
+    progress: null,
+    loadLabel: '',
+    loading: false,
+    gen: 0,
     preludeBlocked: false
   };
 
@@ -878,12 +888,13 @@
       '.nest-listen-btn[aria-pressed="true"]{background:#3b1848;color:#f6f0e6;}' +
       '.nest-listen-btn:focus-visible{outline:2px solid var(--accent,#c4a056);outline-offset:2px;}' +
       '.nest-listen-btn:disabled,.nest-listen-btn.is-unavailable{opacity:0.8;cursor:not-allowed;background:transparent;color:var(--text-muted,#4a5d6c);border-color:var(--border,#c9d5de);font-weight:600;font-size:0.72rem;max-width:14rem;white-space:normal;text-align:right;}' +
+      '.nest-listen-btn.is-busy{font-size:0.72rem;max-width:12.5rem;white-space:normal;text-align:right;}' +
       '.nest-listen-meta{display:flex;flex-direction:column;align-items:flex-end;gap:0.22rem;margin-top:0.35rem;text-align:right;}' +
-      '.nest-listen-honesty{margin:0;max-width:18rem;font-size:0.68rem;line-height:1.35;color:var(--text-muted,#4a5d6c);}' +
+      '.nest-listen-honesty,.nest-listen-caption{margin:0;max-width:18rem;font-size:0.68rem;line-height:1.35;color:var(--text-muted,#4a5d6c);}' +
       '.nest-listen-prelude{appearance:none;-webkit-appearance:none;background:transparent;border:0;padding:0;margin:0;font-family:inherit;font-size:0.72rem;font-weight:600;line-height:1.35;color:#3b1848;text-decoration:underline;text-underline-offset:2px;cursor:pointer;text-align:right;max-width:18rem;}' +
       '.nest-listen-prelude[aria-pressed="true"]{color:var(--accent-dark,#9a7c3a);}' +
       '.nest-listen-prelude:focus-visible{outline:2px solid var(--accent,#c4a056);outline-offset:2px;}' +
-      '@media (max-width:720px){.nest-chrome-titleline{flex-direction:column;align-items:flex-start;gap:0.45rem;}.nest-listen-btn:disabled{text-align:left;}.nest-listen-meta,.nest-listen-prelude{align-items:flex-start;text-align:left;}}' +
+      '@media (max-width:720px){.nest-chrome-titleline{flex-direction:column;align-items:flex-start;gap:0.45rem;}.nest-listen-btn:disabled,.nest-listen-btn.is-busy{text-align:left;}.nest-listen-meta,.nest-listen-prelude{align-items:flex-start;text-align:left;}}' +
       '.nest-lead{margin-top:0.75rem;padding:0.9rem 1rem;border:1px solid var(--border,#e4d6c4);border-left:3px solid var(--accent,#c4a056);border-radius:10px;background:var(--bg,#fffaf3);}' +
       '.nest-lead-kicker{font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-light,#6d8288);}' +
       '.nest-lead-title{font-family:var(--display);font-size:1.12rem;font-weight:700;line-height:1.25;margin-top:0.15rem;}' +
@@ -941,22 +952,267 @@
       '</section>';
   }
 
-  function browserVoiceSupported() {
+  var NEST_LISTEN_HONESTY = 'Synthesized voice · not official Vatican audio · not a Mass substitute · preview';
+  var KOKORO_MODEL = 'onnx-community/Kokoro-82M-v1.0-ONNX';
+  var KOKORO_IMPORT = 'https://cdn.jsdelivr.net/npm/kokoro-js@1.2.1/dist/kokoro.web.js';
+  var KOKORO_STOCK = {
+    af_heart: 1, af_alloy: 1, af_aoede: 1, af_bella: 1, af_jessica: 1, af_kore: 1,
+    af_nicole: 1, af_nova: 1, af_river: 1, af_sarah: 1, af_sky: 1,
+    am_adam: 1, am_echo: 1, am_eric: 1, am_fenrir: 1, am_liam: 1, am_michael: 1,
+    am_onyx: 1, am_puck: 1, am_santa: 1,
+    bf_alice: 1, bf_emma: 1, bf_isabella: 1, bf_lily: 1,
+    bm_daniel: 1, bm_fable: 1, bm_george: 1, bm_lewis: 1
+  };
+
+  function nestVoicePlayable() {
     try {
-      return typeof window.speechSynthesis !== 'undefined' && typeof window.SpeechSynthesisUtterance === 'function';
+      return !!((window.AudioContext || window.webkitAudioContext) || typeof Audio === 'function');
     } catch (e) {
       return false;
     }
   }
 
+  // kokoro-js phonemizes English only. Latin (lang la) is never sent to the model.
+  function nestSpeakText(audio) {
+    if (!audio) return '';
+    var lang = String(audio.lang || '').toLowerCase().replace('_', '-');
+    if (lang === 'la' || lang.indexOf('la-') === 0) return String(audio.english || '').trim();
+    return String(audio.text || '').trim();
+  }
+
   function nestAudioOf(nest) {
     var audio = nest && nest.audio;
-    if (!audio || !String(audio.text || '').trim()) return null;
+    if (!audio || !nestSpeakText(audio)) return null;
     return audio;
   }
 
-  function nestHonesty(audio) {
-    return (audio && audio.honesty) || 'Browser voice · not official Vatican audio · not a Mass substitute · preview';
+  function nestHonesty() {
+    return NEST_LISTEN_HONESTY;
+  }
+
+  function kokoroVoiceId(audio) {
+    var want = audio && String(audio.voice || '');
+    if (KOKORO_STOCK[want]) return want;
+    return KOKORO_STOCK.af_heart ? 'af_heart' : 'af_bella';
+  }
+
+  function kokoroSpeed(audio) {
+    var n = NaN;
+    if (audio && typeof audio.speed === 'number') n = audio.speed;
+    else if (audio && typeof audio.rate === 'number') n = audio.rate;
+    if (!isFinite(n) || n <= 0) return 1;
+    if (n < 0.5) return 0.5;
+    if (n > 2) return 2;
+    return n;
+  }
+
+  function kokoroClipKey(nest, text, voice, speed) {
+    return (nest && nest.slug || '') + '\n' + voice + '\n' + String(speed) + '\n' + text;
+  }
+
+  function splitForKokoro(text) {
+    var src = String(text || '').replace(/\s+/g, ' ').trim();
+    if (!src) return [];
+    var out = [];
+    var buf = '';
+    for (var i = 0; i < src.length; i++) {
+      buf += src.charAt(i);
+      var ch = src.charAt(i);
+      if ((ch === '.' || ch === '!' || ch === '?') && (i + 1 >= src.length || src.charAt(i + 1) === ' ')) {
+        if (buf.trim()) out.push(buf.trim());
+        buf = '';
+      }
+    }
+    if (buf.trim()) out.push(buf.trim());
+    return out.length ? out : [src];
+  }
+
+  function silenceSamples(sampleRate, ms) {
+    return new Float32Array(Math.max(0, Math.round(sampleRate * ms / 1000)));
+  }
+
+  function concatFloat32(chunks) {
+    var n = 0;
+    var i;
+    for (i = 0; i < chunks.length; i++) n += chunks[i].length;
+    var out = new Float32Array(n);
+    var offset = 0;
+    for (i = 0; i < chunks.length; i++) {
+      out.set(chunks[i], offset);
+      offset += chunks[i].length;
+    }
+    return out;
+  }
+
+  function floatToWavBlob(samples, sampleRate) {
+    var n = samples.length;
+    var buffer = new ArrayBuffer(44 + n * 2);
+    var view = new DataView(buffer);
+    function writeStr(off, str) {
+      for (var i = 0; i < str.length; i++) view.setUint8(off + i, str.charCodeAt(i));
+    }
+    writeStr(0, 'RIFF');
+    view.setUint32(4, 36 + n * 2, true);
+    writeStr(8, 'WAVE');
+    writeStr(12, 'fmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true);
+    view.setUint16(22, 1, true);
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * 2, true);
+    view.setUint16(32, 2, true);
+    view.setUint16(34, 16, true);
+    writeStr(36, 'data');
+    view.setUint32(40, n * 2, true);
+    var offset = 44;
+    for (var s = 0; s < n; s++) {
+      var x = samples[s];
+      if (x > 1) x = 1;
+      else if (x < -1) x = -1;
+      view.setInt16(offset, x < 0 ? x * 0x8000 : x * 0x7fff, true);
+      offset += 2;
+    }
+    return new Blob([buffer], { type: 'audio/wav' });
+  }
+
+  function noteKokoroProgress(info) {
+    if (!info || typeof info !== 'object') return null;
+    var file = info.file || info.name || '';
+    if (!file) {
+      if (typeof info.progress === 'number' && isFinite(info.progress)) {
+        return Math.max(0, Math.min(100, Math.round(info.progress)));
+      }
+      return null;
+    }
+    if (!nestVoice.progress) nestVoice.progress = {};
+    var loaded = null;
+    var total = null;
+    if (typeof info.loaded === 'number' && typeof info.total === 'number' && info.total > 0) {
+      loaded = info.loaded;
+      total = info.total;
+    } else if (typeof info.progress === 'number' && isFinite(info.progress)) {
+      loaded = info.progress;
+      total = 100;
+    }
+    if (info.status === 'done' && nestVoice.progress[file]) {
+      loaded = nestVoice.progress[file].total;
+      total = nestVoice.progress[file].total;
+    }
+    if (loaded == null || !total) return null;
+    nestVoice.progress[file] = { loaded: loaded, total: total };
+    var keys = Object.keys(nestVoice.progress);
+    var sumL = 0;
+    var sumT = 0;
+    var sawModel = false;
+    for (var i = 0; i < keys.length; i++) {
+      var part = nestVoice.progress[keys[i]];
+      sumL += part.loaded;
+      sumT += part.total;
+      if (part.total >= 1000000) sawModel = true;
+    }
+    if (!sumT || !sawModel) return null;
+    return Math.max(0, Math.min(100, Math.round((100 * sumL) / sumT)));
+  }
+
+  function kokoroDevice() {
+    var wasm = { device: 'wasm', dtype: 'q8' };
+    return new Promise(function (resolve) {
+      var settled = false;
+      function finish(pick) {
+        if (settled) return;
+        settled = true;
+        resolve(pick);
+      }
+      try {
+        if (!navigator.gpu || typeof navigator.gpu.requestAdapter !== 'function') {
+          finish(wasm);
+          return;
+        }
+        var timer = setTimeout(function () { finish(wasm); }, 1500);
+        Promise.resolve(navigator.gpu.requestAdapter()).then(function (adapter) {
+          clearTimeout(timer);
+          finish(adapter ? { device: 'webgpu', dtype: 'fp32' } : wasm);
+        }, function () {
+          clearTimeout(timer);
+          finish(wasm);
+        });
+      } catch (e) {
+        finish(wasm);
+      }
+    });
+  }
+
+  function loadKokoro() {
+    if (nestVoice.engine) return Promise.resolve(nestVoice.engine);
+    if (nestVoice.enginePromise) return nestVoice.enginePromise;
+    nestVoice.enginePromise = (async function () {
+      var mod = await import(KOKORO_IMPORT);
+      var KokoroTTS = mod && (mod.KokoroTTS || mod.default);
+      if (!KokoroTTS || typeof KokoroTTS.from_pretrained !== 'function') {
+        throw new Error('Kokoro failed to load');
+      }
+      var picked = await kokoroDevice();
+      function run(pick) {
+        nestVoice.progress = {};
+        return KokoroTTS.from_pretrained(KOKORO_MODEL, {
+          dtype: pick.dtype,
+          device: pick.device,
+          progress_callback: function (info) {
+            if (nestVoice.onProgress) nestVoice.onProgress(info);
+          }
+        });
+      }
+      try {
+        return await run(picked);
+      } catch (err) {
+        if (picked.device !== 'webgpu') throw err;
+        return await run({ device: 'wasm', dtype: 'q8' });
+      }
+    })().then(function (tts) {
+      nestVoice.engine = tts;
+      return tts;
+    }, function (err) {
+      nestVoice.enginePromise = null;
+      throw err;
+    });
+    return nestVoice.enginePromise;
+  }
+
+  function unlockNestAudio() {
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return null;
+    try {
+      if (!nestVoice.ctx || nestVoice.ctx.state === 'closed') nestVoice.ctx = new AC();
+      var pending = nestVoice.ctx.resume();
+      if (pending && typeof pending.catch === 'function') pending.catch(function () {});
+    } catch (e) {
+      return null;
+    }
+    return nestVoice.ctx;
+  }
+
+  function stopNestSource() {
+    var src = nestVoice.source;
+    nestVoice.source = null;
+    if (src) {
+      try { src.onended = null; } catch (e) {}
+      try { src.stop(); } catch (e2) {}
+      try { src.disconnect(); } catch (e3) {}
+    }
+    var el = nestVoice.speakAudio;
+    nestVoice.speakAudio = null;
+    if (el) {
+      try { el.onended = null; } catch (e4) {}
+      try { el.pause(); } catch (e5) {}
+      try {
+        el.removeAttribute('src');
+        el.load();
+      } catch (e6) {}
+    }
+    if (nestVoice.speakUrl) {
+      try { URL.revokeObjectURL(nestVoice.speakUrl); } catch (e7) {}
+      nestVoice.speakUrl = null;
+    }
   }
 
   function oggMaybe() {
@@ -967,13 +1223,6 @@
       return t === 'probably' || t === 'maybe';
     } catch (e) {
       return false;
-    }
-  }
-
-  function stopNestVoiceKeep() {
-    if (nestVoice.keep) {
-      clearInterval(nestVoice.keep);
-      nestVoice.keep = null;
     }
   }
 
@@ -989,24 +1238,55 @@
   }
 
   function stopNestTts() {
-    stopNestVoiceKeep();
-    nestVoice.utterance = null;
-    if (window.speechSynthesis) {
-      try { window.speechSynthesis.cancel(); } catch (e) {}
+    nestVoice.gen += 1;
+    nestVoice.loading = false;
+    nestVoice.onProgress = null;
+    nestVoice.loadLabel = '';
+    stopNestSource();
+  }
+
+  function listenPhase(nest) {
+    if (!nest || nestVoice.mode !== 'tts' || nestVoice.slug !== nest.slug) return 'idle';
+    return nestVoice.loading ? 'loading' : 'playing';
+  }
+
+  function listenControl(nest) {
+    var label = (nest && (nest.label || nest.slug)) || 'this nest';
+    var phase = listenPhase(nest);
+    if (phase === 'loading') {
+      var loadingText = nestVoice.loadLabel || 'Loading voice…';
+      return {
+        text: loadingText,
+        aria: 'Stop. ' + loadingText + ' for ' + label,
+        busy: true,
+        pressed: true
+      };
     }
+    if (phase === 'playing') {
+      return {
+        text: 'Stop',
+        aria: 'Stop synthesized voice for ' + label,
+        busy: false,
+        pressed: true
+      };
+    }
+    return {
+      text: 'Listen',
+      aria: 'Listen to ' + label + '. Synthesized voice, not official Vatican audio, not a Mass substitute, preview.',
+      busy: false,
+      pressed: false
+    };
   }
 
   function syncNestListenUi() {
     var nest = currentNest;
     var btn = document.getElementById('nest-listen-btn');
     if (btn && !btn.disabled && nest) {
-      var playing = nestVoice.mode === 'tts' && nestVoice.slug === nest.slug;
-      var label = nest.label || nest.slug;
-      btn.setAttribute('aria-pressed', playing ? 'true' : 'false');
-      btn.textContent = playing ? 'Stop' : 'Listen';
-      btn.setAttribute('aria-label', playing
-        ? ('Stop browser voice for ' + label)
-        : ('Listen to ' + label + '. Browser voice, not official Vatican audio, not a Mass substitute, preview.'));
+      var ctl = listenControl(nest);
+      btn.setAttribute('aria-pressed', ctl.pressed ? 'true' : 'false');
+      btn.textContent = ctl.text;
+      btn.setAttribute('aria-label', ctl.aria);
+      btn.classList.toggle('is-busy', !!ctl.busy);
     }
     var pre = document.getElementById('nest-listen-prelude');
     if (pre && nest) {
@@ -1027,78 +1307,201 @@
     syncNestListenUi();
   }
 
-  function pickVoice(lang) {
-    if (!lang || !window.speechSynthesis || !window.speechSynthesis.getVoices) return null;
-    var voices = [];
-    try { voices = window.speechSynthesis.getVoices() || []; } catch (e) { return null; }
-    var want = String(lang).toLowerCase();
-    for (var i = 0; i < voices.length; i++) {
-      var vl = String(voices[i].lang || '').toLowerCase();
-      if (vl === want || vl.indexOf(want + '-') === 0) return voices[i];
+  function finishSpeak(gen) {
+    if (nestVoice.gen !== gen) return;
+    nestVoice.mode = '';
+    nestVoice.slug = '';
+    nestVoice.loading = false;
+    nestVoice.loadLabel = '';
+    syncNestListenUi();
+  }
+
+  function playBuffer(buffer, gen) {
+    var ctx = nestVoice.ctx;
+    if (!ctx || !buffer || nestVoice.gen !== gen) return false;
+    function go() {
+      if (nestVoice.gen !== gen) return;
+      var src = ctx.createBufferSource();
+      src.buffer = buffer;
+      src.connect(ctx.destination);
+      nestVoice.source = src;
+      src.onended = function () {
+        if (nestVoice.source !== src) return;
+        nestVoice.source = null;
+        finishSpeak(gen);
+      };
+      try { src.start(); }
+      catch (e) {
+        nestVoice.source = null;
+        finishSpeak(gen);
+      }
     }
-    return null;
+    if (ctx.state === 'suspended' && typeof ctx.resume === 'function') {
+      Promise.resolve(ctx.resume()).then(go, go);
+      return true;
+    }
+    go();
+    return !!nestVoice.source;
+  }
+
+  function samplesToBuffer(samples, sampleRate) {
+    var ctx = nestVoice.ctx;
+    if (!ctx || !samples || !samples.length) return null;
+    var buffer = ctx.createBuffer(1, samples.length, sampleRate);
+    buffer.getChannelData(0).set(samples);
+    return buffer;
+  }
+
+  function playBlob(blob, gen) {
+    var url = URL.createObjectURL(blob);
+    var player = new Audio();
+    nestVoice.speakUrl = url;
+    nestVoice.speakAudio = player;
+    player.preload = 'auto';
+    player.src = url;
+    player.onended = function () {
+      if (nestVoice.speakAudio !== player) return;
+      finishSpeak(gen);
+    };
+    var played;
+    try { played = player.play(); }
+    catch (e) { return Promise.resolve(false); }
+    if (played && typeof played.then === 'function') {
+      return played.then(function () { return true; }, function () { return false; });
+    }
+    return Promise.resolve(true);
   }
 
   function startNestTts(nest) {
     var audio = nestAudioOf(nest);
-    if (!audio || !browserVoiceSupported()) return;
+    var text = nestSpeakText(audio);
+    if (!audio || !text || !nestVoicePlayable()) return;
+    unlockNestAudio();
     stopNestPrelude();
     stopNestTts();
-    var u = new SpeechSynthesisUtterance(audio.text);
-    if (typeof audio.rate === 'number' && isFinite(audio.rate)) u.rate = audio.rate;
-    if (audio.lang) {
-      u.lang = audio.lang;
-      var voice = pickVoice(audio.lang);
-      if (voice) {
-        try { u.voice = voice; } catch (e) {}
-      }
-    }
-    u.onend = function () {
-      if (nestVoice.utterance !== u) return;
-      nestVoice.utterance = null;
-      nestVoice.mode = '';
-      nestVoice.slug = '';
-      stopNestVoiceKeep();
-      syncNestListenUi();
-    };
-    u.onerror = function () {
-      if (nestVoice.utterance !== u) return;
-      nestVoice.utterance = null;
-      nestVoice.mode = '';
-      nestVoice.slug = '';
-      stopNestVoiceKeep();
-      syncNestListenUi();
-    };
+    var gen = nestVoice.gen;
+    var voice = kokoroVoiceId(audio);
+    var speed = kokoroSpeed(audio);
+    var key = kokoroClipKey(nest, text, voice, speed);
     nestVoice.mode = 'tts';
     nestVoice.slug = nest.slug;
-    nestVoice.utterance = u;
-    try {
-      window.speechSynthesis.speak(u);
-    } catch (e) {
-      nestVoice.mode = '';
-      nestVoice.slug = '';
-      nestVoice.utterance = null;
-      syncNestListenUi();
-      return;
-    }
-    stopNestVoiceKeep();
-    nestVoice.keep = setInterval(function () {
-      var synth = window.speechSynthesis;
-      if (!synth || nestVoice.mode !== 'tts') {
-        stopNestVoiceKeep();
+    nestVoice.loading = true;
+    nestVoice.loadLabel = 'Loading voice…';
+    syncNestListenUi();
+
+    if (nestVoice.clips[key]) {
+      nestVoice.loading = false;
+      if (playBuffer(nestVoice.clips[key], gen)) {
+        syncNestListenUi();
         return;
       }
-      if (!synth.speaking && !synth.pending) return;
-      try {
-        synth.pause();
-        synth.resume();
-      } catch (err) {}
-    }, 10000);
-    syncNestListenUi();
+    }
+    if (nestVoice.wavBlobs && nestVoice.wavBlobs[key]) {
+      playBlob(nestVoice.wavBlobs[key], gen).then(function (ok) {
+        if (nestVoice.gen !== gen) return;
+        nestVoice.loading = false;
+        if (!ok) {
+          nestVoice.mode = '';
+          nestVoice.slug = '';
+        }
+        syncNestListenUi();
+      });
+      return;
+    }
+
+    nestVoice.onProgress = function (info) {
+      if (nestVoice.gen !== gen) return;
+      var pct = noteKokoroProgress(info);
+      var label = pct == null ? 'Loading voice…' : ('Loading voice… ' + pct + '%');
+      nestVoice.loadLabel = label;
+      var btn = document.getElementById('nest-listen-btn');
+      if (!btn || btn.disabled) return;
+      if (listenPhase(currentNest) !== 'loading') return;
+      btn.textContent = label;
+      btn.classList.add('is-busy');
+      btn.setAttribute('aria-pressed', 'true');
+      var name = (currentNest && (currentNest.label || currentNest.slug)) || 'this nest';
+      btn.setAttribute('aria-label', 'Stop. ' + label + ' for ' + name);
+    };
+
+    loadKokoro().then(function (tts) {
+      if (nestVoice.gen !== gen) return null;
+      if (tts && tts.voices && !tts.voices[voice]) {
+        voice = (tts.voices.af_heart && 'af_heart') || (tts.voices.af_bella && 'af_bella') || voice;
+      }
+      nestVoice.loadLabel = 'Loading voice…';
+      if (nestVoice.gen === gen) syncNestListenUi();
+      var parts = splitForKokoro(text);
+      var chain = Promise.resolve([]);
+      parts.forEach(function (part) {
+        chain = chain.then(function (chunks) {
+          if (nestVoice.gen !== gen) return chunks;
+          return new Promise(function (resolve) { setTimeout(resolve, 0); }).then(function () {
+            if (nestVoice.gen !== gen) return chunks;
+            function take(clip, into) {
+              if (!clip || !clip.audio || !clip.audio.length) throw new Error('empty audio');
+              var rate = clip.sampling_rate || 24000;
+              if (into.length) into.push(silenceSamples(rate, 70));
+              into.push(clip.audio);
+              into.rate = rate;
+              return into;
+            }
+            return tts.generate(part, { voice: voice, speed: speed }).then(function (clip) {
+              return take(clip, chunks);
+            }, function (err) {
+              if (voice === 'af_bella' || !KOKORO_STOCK.af_bella) throw err;
+              voice = 'af_bella';
+              return tts.generate(part, { voice: 'af_bella', speed: speed }).then(function (clip) {
+                return take(clip, chunks);
+              });
+            });
+          });
+        });
+      });
+      return chain;
+    }).then(function (chunks) {
+      if (!chunks || nestVoice.gen !== gen) return;
+      var samples = concatFloat32(chunks);
+      var rate = chunks.rate || 24000;
+      if (!samples.length || nestVoice.gen !== gen) return;
+      var spokenVoice = voice;
+      var buffer = samplesToBuffer(samples, rate);
+      if (buffer) {
+        var storeKey = kokoroClipKey(nest, text, spokenVoice, speed);
+        nestVoice.clips[storeKey] = buffer;
+        nestVoice.clips[key] = buffer;
+        nestVoice.loading = false;
+        if (!playBuffer(buffer, gen)) throw new Error('playback failed');
+        syncNestListenUi();
+        return;
+      }
+      if (!nestVoice.wavBlobs) nestVoice.wavBlobs = {};
+      var blob = floatToWavBlob(samples, rate);
+      nestVoice.wavBlobs[kokoroClipKey(nest, text, spokenVoice, speed)] = blob;
+      nestVoice.wavBlobs[key] = blob;
+      return playBlob(blob, gen).then(function (ok) {
+        if (nestVoice.gen !== gen) return;
+        nestVoice.loading = false;
+        if (!ok) {
+          nestVoice.mode = '';
+          nestVoice.slug = '';
+        }
+        syncNestListenUi();
+      });
+    }).catch(function (err) {
+      if (nestVoice.gen !== gen) return;
+      console.warn('nest listen', err);
+      nestVoice.loading = false;
+      nestVoice.mode = '';
+      nestVoice.slug = '';
+      nestVoice.loadLabel = '';
+      syncNestListenUi();
+    });
   }
 
   function toggleNestTts() {
-    if (!currentNest || !browserVoiceSupported()) return;
+    if (!currentNest || !nestVoicePlayable()) return;
+    unlockNestAudio();
     if (nestVoice.mode === 'tts' && nestVoice.slug === currentNest.slug) {
       stopNestVoice();
       return;
@@ -1176,19 +1579,13 @@
   function nestListenParts(nest) {
     var audio = nestAudioOf(nest);
     if (!audio) return { button: '', notes: '' };
-    var label = nest.label || nest.slug;
-    var supported = browserVoiceSupported();
     var btn;
-    if (!supported) {
+    if (!nestVoicePlayable()) {
       btn = '<button type="button" class="nest-listen-btn is-unavailable" id="nest-listen-btn" disabled aria-disabled="true">Voice unavailable in this browser</button>';
     } else {
-      var playing = nestVoice.mode === 'tts' && nestVoice.slug === nest.slug;
-      btn = '<button type="button" class="nest-listen-btn" id="nest-listen-btn" data-nest-listen="tts" aria-pressed="' +
-        (playing ? 'true' : 'false') + '" aria-label="' +
-        escapeHtml(playing
-          ? ('Stop browser voice for ' + label)
-          : ('Listen to ' + label + '. Browser voice, not official Vatican audio, not a Mass substitute, preview.')) +
-        '">' + (playing ? 'Stop' : 'Listen') + '</button>';
+      var ctl = listenControl(nest);
+      btn = '<button type="button" class="nest-listen-btn' + (ctl.busy ? ' is-busy' : '') + '" id="nest-listen-btn" data-nest-listen="tts" aria-pressed="' +
+        (ctl.pressed ? 'true' : 'false') + '" aria-label="' + escapeHtml(ctl.aria) + '">' + escapeHtml(ctl.text) + '</button>';
     }
     var extra = '';
     var opt = audio.optionalInstrumental;
@@ -1199,7 +1596,10 @@
         (on ? 'true' : 'false') + '" aria-label="' + escapeHtml((on ? 'Stop. ' : 'Play. ') + honest) + '">' +
         escapeHtml(on ? 'Stop prelude' : honest) + '</button>';
     }
-    var note = '<p class="nest-listen-honesty">' + escapeHtml(nestHonesty(audio)) + '</p>';
+    var caption = audio.caption
+      ? '<p class="nest-listen-caption">' + escapeHtml(audio.caption) + '</p>'
+      : '';
+    var note = '<p class="nest-listen-honesty">' + escapeHtml(nestHonesty()) + '</p>' + caption;
     var notes = (note || extra) ? ('<div class="nest-listen-meta">' + note + extra + '</div>') : '';
     return { button: btn, notes: notes };
   }
