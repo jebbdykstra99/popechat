@@ -968,6 +968,7 @@
     { id: 'bm_george', label: 'George' }
   ];
   var NEST_VOICE_KEY = 'popechat.nestListenVoice';
+  var NEST_VOICE_SESSION_KEY = 'popechat.nestListenVoiceSession';
 
   function nestVoicePlayable() {
     try {
@@ -1002,6 +1003,58 @@
     return null;
   }
 
+  function nestListenConfig() {
+    return (typeof SITE !== 'undefined' && SITE && SITE.nestListen) ? SITE.nestListen : null;
+  }
+
+  function defaultRotationRows() {
+    var cfg = nestListenConfig();
+    var rows = (cfg && cfg.defaultRotation) || [
+      { id: 'af_bella', weight: 60 },
+      { id: 'bm_george', weight: 40 }
+    ];
+    var exclude = {};
+    var ex = (cfg && cfg.excludeFromDefault) || ['af_heart'];
+    for (var i = 0; i < ex.length; i++) exclude[ex[i]] = true;
+    var out = [];
+    for (var j = 0; j < rows.length; j++) {
+      var id = rows[j] && rows[j].id;
+      var w = rows[j] && rows[j].weight;
+      if (!pastoralById(id) || exclude[id]) continue;
+      var n = Number(w);
+      if (!isFinite(n) || n <= 0) n = 1;
+      out.push({ id: id, weight: n });
+    }
+    if (!out.length) out = [{ id: 'af_bella', weight: 60 }, { id: 'bm_george', weight: 40 }];
+    return out;
+  }
+
+  function rollDefaultNestVoice() {
+    var rows = defaultRotationRows();
+    var total = 0;
+    for (var i = 0; i < rows.length; i++) total += rows[i].weight;
+    var r = Math.random() * total;
+    var acc = 0;
+    for (var j = 0; j < rows.length; j++) {
+      acc += rows[j].weight;
+      if (r < acc) return rows[j].id;
+    }
+    return rows[0].id;
+  }
+
+  function sessionNestVoice() {
+    try {
+      var id = sessionStorage.getItem(NEST_VOICE_SESSION_KEY) || '';
+      if (pastoralById(id)) return id;
+    } catch (e) {}
+    return '';
+  }
+
+  function rememberSessionNestVoice(id) {
+    if (!pastoralById(id)) return;
+    try { sessionStorage.setItem(NEST_VOICE_SESSION_KEY, id); } catch (e) {}
+  }
+
   function savedNestVoice() {
     try {
       var id = localStorage.getItem(NEST_VOICE_KEY) || '';
@@ -1011,26 +1064,37 @@
   }
 
   function kokoroVoiceId(audio) {
+    // Explicit picker choice (localStorage) wins across visits.
     var saved = savedNestVoice();
     if (saved) return saved;
-    var want = audio && String(audio.voice || '');
-    if (pastoralById(want)) return want;
-    return 'af_heart';
+    // Sticky-per-session weighted default (60% Bella / 40% George; Heart excluded).
+    var sess = sessionNestVoice();
+    if (sess) return sess;
+    var picked = rollDefaultNestVoice();
+    rememberSessionNestVoice(picked);
+    return picked;
   }
 
   function rememberNestVoice(id) {
     if (!pastoralById(id)) return;
     try { localStorage.setItem(NEST_VOICE_KEY, id); } catch (e) {}
+    rememberSessionNestVoice(id);
     for (var i = 0; i < NESTS.length; i++) {
       if (NESTS[i] && NESTS[i].audio) NESTS[i].audio.voice = id;
     }
   }
 
   function pastoralFallback(failed) {
-    for (var i = 0; i < KOKORO_PASTORAL.length; i++) {
-      if (KOKORO_PASTORAL[i].id !== failed) return KOKORO_PASTORAL[i].id;
+    var rows = defaultRotationRows();
+    for (var i = 0; i < rows.length; i++) {
+      if (rows[i].id !== failed) return rows[i].id;
     }
-    return 'af_heart';
+    for (var j = 0; j < KOKORO_PASTORAL.length; j++) {
+      if (KOKORO_PASTORAL[j].id !== failed && KOKORO_PASTORAL[j].id !== 'af_heart') {
+        return KOKORO_PASTORAL[j].id;
+      }
+    }
+    return 'af_bella';
   }
 
   function kokoroSpeed(audio) {
@@ -1471,7 +1535,7 @@
     loadKokoro().then(function (tts) {
       if (nestVoice.gen !== gen) return null;
       if (tts && tts.voices && !tts.voices[voice]) {
-        voice = 'af_heart';
+        voice = pastoralFallback(voice) || 'af_bella';
         for (var vi = 0; vi < KOKORO_PASTORAL.length; vi++) {
           if (tts.voices[KOKORO_PASTORAL[vi].id]) {
             voice = KOKORO_PASTORAL[vi].id;
