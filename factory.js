@@ -956,7 +956,7 @@
   }
 
   function nestHonesty(audio) {
-    return (audio && audio.honesty) || 'Browser voice · not official Vatican audio · not a Mass substitute';
+    return (audio && audio.honesty) || 'Browser voice · not official Vatican audio · not a Mass substitute · preview';
   }
 
   function oggMaybe() {
@@ -1006,7 +1006,7 @@
       btn.textContent = playing ? 'Stop' : 'Listen';
       btn.setAttribute('aria-label', playing
         ? ('Stop browser voice for ' + label)
-        : ('Listen to ' + label + '. Browser voice, not official Vatican audio, not a Mass substitute.'));
+        : ('Listen to ' + label + '. Browser voice, not official Vatican audio, not a Mass substitute, preview.'));
     }
     var pre = document.getElementById('nest-listen-prelude');
     if (pre && nest) {
@@ -1187,7 +1187,7 @@
         (playing ? 'true' : 'false') + '" aria-label="' +
         escapeHtml(playing
           ? ('Stop browser voice for ' + label)
-          : ('Listen to ' + label + '. Browser voice, not official Vatican audio, not a Mass substitute.')) +
+          : ('Listen to ' + label + '. Browser voice, not official Vatican audio, not a Mass substitute, preview.')) +
         '">' + (playing ? 'Stop' : 'Listen') + '</button>';
     }
     var extra = '';
@@ -1199,9 +1199,7 @@
         (on ? 'true' : 'false') + '" aria-label="' + escapeHtml((on ? 'Stop. ' : 'Play. ') + honest) + '">' +
         escapeHtml(on ? 'Stop prelude' : honest) + '</button>';
     }
-    var note = supported
-      ? ('<p class="nest-listen-honesty">' + escapeHtml(nestHonesty(audio)) + '</p>')
-      : '';
+    var note = '<p class="nest-listen-honesty">' + escapeHtml(nestHonesty(audio)) + '</p>';
     var notes = (note || extra) ? ('<div class="nest-listen-meta">' + note + extra + '</div>') : '';
     return { button: btn, notes: notes };
   }
