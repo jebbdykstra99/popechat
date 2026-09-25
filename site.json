@@ -446,8 +446,23 @@
     "title": "Room Brief",
     "kicker": "Urbi et orbi",
     "meta": "From the source",
-    "footer": "Vatican News as a link. Not a lectionary paste. Ads off. Not official Vatican. Not a meme. Watch Mass live via official outbound only. Not hosted here. Not a substitute for parish Mass when you can go.",
+    "footer": "Vatican News as a link. Not a lectionary paste. Ads off. Not official Vatican. Not a meme. Watch Mass live via official outbound only. Not hosted here. Not a substitute for parish Mass when you can go. Virtual tours open on the Museums site. We do not host them. Not a Mass. Not a substitute for an in-person visit.",
+    "maxCards": 11,
     "outbound": [
+      {
+        "tag": "Vatican",
+        "headline": "Vatican Media Live",
+        "url": "https://www.youtube.com/user/vatican/live",
+        "snippet": "Official papal Masses/celebrations — live when on air. Opens on YouTube. Outbound only; we do not host.",
+        "meta": "Official · link-out"
+      },
+      {
+        "tag": "Vatican",
+        "headline": "Dicastery Live",
+        "url": "https://www.comunicazione.va/en/servizi/live.html",
+        "snippet": "Dicastery for Communication live page. Outbound only; we do not host. Not a substitute for parish Mass.",
+        "meta": "Official · link-out"
+      },
       {
         "tag": "Vatican",
         "headline": "Vatican News",
@@ -456,17 +471,52 @@
         "meta": "Official · link-out"
       },
       {
-        "tag": "Vatican",
-        "headline": "Vatican Media Live",
-        "url": "https://www.youtube.com/user/vatican/live",
-        "snippet": "Official papal Masses/celebrations — live when on air. Outbound only; we do not host.",
-        "meta": "Official · link-out"
-      },
-      {
         "tag": "Mass",
         "headline": "EWTN Daily Mass",
         "url": "https://www.ewtn.com/tv/watch-live/united-states",
         "snippet": "Free official stream; Daily Mass ~8 a.m. ET (Irondale). Outbound only; we do not host.",
+        "meta": "Official · link-out"
+      },
+      {
+        "tag": "Mass",
+        "headline": "CatholicTV Live",
+        "url": "https://watch.catholictv.org/live",
+        "snippet": "Official live stream. Outbound only; we do not host. Not a substitute for parish Mass.",
+        "meta": "Official · link-out"
+      },
+      {
+        "tag": "Mass",
+        "headline": "Daily TV Mass",
+        "url": "https://dailytvmass.com/",
+        "snippet": "NCBC Daily TV Mass. Official link-out; we do not host. Not a substitute for parish Mass.",
+        "meta": "Official · link-out"
+      },
+      {
+        "tag": "Mass",
+        "headline": "Mass livestream directory",
+        "url": "https://mass-online.org/",
+        "snippet": "Directory of Mass livestreams. Link-out only. Not official Vatican. Not hosted here. Not a parish substitute.",
+        "meta": "Directory · link-out"
+      },
+      {
+        "tag": "Museums",
+        "headline": "Vatican Museums virtual tours",
+        "url": "https://www.museivaticani.va/content/museivaticani/en/collezioni/musei/tour-virtuali-elenco.html",
+        "snippet": "Opens on the Museums site. We do not host. Not a Mass. Not a substitute for an in-person visit.",
+        "meta": "Official · link-out"
+      },
+      {
+        "tag": "Museums",
+        "headline": "Sistine Chapel",
+        "url": "https://www.museivaticani.va/content/museivaticani/en/collezioni/musei/cappella-sistina/tour-virtuale.html",
+        "snippet": "Virtual tour opens on the Museums site. We do not host. Not a Mass. Not an in-person visit.",
+        "meta": "Official · link-out"
+      },
+      {
+        "tag": "Museums",
+        "headline": "Raphael's Rooms",
+        "url": "https://www.museivaticani.va/content/museivaticani/en/collezioni/musei/stanze-di-raffaello/tour-virtuale.html",
+        "snippet": "Virtual tour opens on the Museums site. We do not host. Not a Mass. Not an in-person visit.",
         "meta": "Official · link-out"
       }
     ],
