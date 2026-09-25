@@ -962,13 +962,13 @@
   var KOKORO_MODEL = 'onnx-community/Kokoro-82M-v1.0-ONNX';
   var KOKORO_IMPORT = 'https://cdn.jsdelivr.net/npm/kokoro-js@1.2.1/dist/kokoro.web.js';
   var KOKORO_PASTORAL = [
-    { id: 'af_heart', label: 'Heart' },
+    { id: 'bm_george', label: 'George' },
+    { id: 'am_michael', label: 'Michael' },
     { id: 'af_bella', label: 'Bella' },
     { id: 'bf_emma', label: 'Emma' },
-    { id: 'bm_george', label: 'George' }
+    { id: 'af_heart', label: 'Heart' }
   ];
   var NEST_VOICE_KEY = 'popechat.nestListenVoice';
-  var NEST_VOICE_SESSION_KEY = 'popechat.nestListenVoiceSession';
 
   function nestVoicePlayable() {
     try {
@@ -1007,52 +1007,11 @@
     return (typeof SITE !== 'undefined' && SITE && SITE.nestListen) ? SITE.nestListen : null;
   }
 
-  function defaultRotationRows() {
+  function lockedDefaultVoice() {
     var cfg = nestListenConfig();
-    var rows = (cfg && cfg.defaultRotation) || [
-      { id: 'af_bella', weight: 60 },
-      { id: 'bm_george', weight: 40 }
-    ];
-    var exclude = {};
-    var ex = (cfg && cfg.excludeFromDefault) || ['af_heart'];
-    for (var i = 0; i < ex.length; i++) exclude[ex[i]] = true;
-    var out = [];
-    for (var j = 0; j < rows.length; j++) {
-      var id = rows[j] && rows[j].id;
-      var w = rows[j] && rows[j].weight;
-      if (!pastoralById(id) || exclude[id]) continue;
-      var n = Number(w);
-      if (!isFinite(n) || n <= 0) n = 1;
-      out.push({ id: id, weight: n });
-    }
-    if (!out.length) out = [{ id: 'af_bella', weight: 60 }, { id: 'bm_george', weight: 40 }];
-    return out;
-  }
-
-  function rollDefaultNestVoice() {
-    var rows = defaultRotationRows();
-    var total = 0;
-    for (var i = 0; i < rows.length; i++) total += rows[i].weight;
-    var r = Math.random() * total;
-    var acc = 0;
-    for (var j = 0; j < rows.length; j++) {
-      acc += rows[j].weight;
-      if (r < acc) return rows[j].id;
-    }
-    return rows[0].id;
-  }
-
-  function sessionNestVoice() {
-    try {
-      var id = sessionStorage.getItem(NEST_VOICE_SESSION_KEY) || '';
-      if (pastoralById(id)) return id;
-    } catch (e) {}
-    return '';
-  }
-
-  function rememberSessionNestVoice(id) {
-    if (!pastoralById(id)) return;
-    try { sessionStorage.setItem(NEST_VOICE_SESSION_KEY, id); } catch (e) {}
+    var want = (cfg && cfg.defaultVoice) || 'bm_george';
+    if (pastoralById(want)) return want;
+    return 'bm_george';
   }
 
   function savedNestVoice() {
@@ -1064,37 +1023,30 @@
   }
 
   function kokoroVoiceId(audio) {
-    // Explicit picker choice (localStorage) wins across visits.
+    // Explicit picker choice wins. Else fixed default bm_george (Jebb lock; 60/40 cancelled).
     var saved = savedNestVoice();
     if (saved) return saved;
-    // Sticky-per-session weighted default (60% Bella / 40% George; Heart excluded).
-    var sess = sessionNestVoice();
-    if (sess) return sess;
-    var picked = rollDefaultNestVoice();
-    rememberSessionNestVoice(picked);
-    return picked;
+    var want = audio && String(audio.voice || '');
+    if (pastoralById(want) && want === lockedDefaultVoice()) return want;
+    return lockedDefaultVoice();
   }
 
   function rememberNestVoice(id) {
     if (!pastoralById(id)) return;
     try { localStorage.setItem(NEST_VOICE_KEY, id); } catch (e) {}
-    rememberSessionNestVoice(id);
     for (var i = 0; i < NESTS.length; i++) {
       if (NESTS[i] && NESTS[i].audio) NESTS[i].audio.voice = id;
     }
   }
 
   function pastoralFallback(failed) {
-    var rows = defaultRotationRows();
-    for (var i = 0; i < rows.length; i++) {
-      if (rows[i].id !== failed) return rows[i].id;
+    var pref = lockedDefaultVoice();
+    if (pref !== failed && pastoralById(pref)) return pref;
+    for (var i = 0; i < KOKORO_PASTORAL.length; i++) {
+      var id = KOKORO_PASTORAL[i].id;
+      if (id !== failed && id !== 'af_heart' && id !== 'af_bella' && id !== 'bf_emma') return id;
     }
-    for (var j = 0; j < KOKORO_PASTORAL.length; j++) {
-      if (KOKORO_PASTORAL[j].id !== failed && KOKORO_PASTORAL[j].id !== 'af_heart') {
-        return KOKORO_PASTORAL[j].id;
-      }
-    }
-    return 'af_bella';
+    return 'bm_george';
   }
 
   function kokoroSpeed(audio) {
