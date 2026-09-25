@@ -864,11 +864,9 @@
     if (brandSub) brandSub.textContent = nest ? (nest.label || nest.slug) : tag;
     var input = document.getElementById('thoughts-compose-input');
     if (input) {
-      var ph = nest
-        ? ('What about ' + (nest.label || nest.slug) + '?')
-        : ((site && site.composePlaceholder) || input.getAttribute('data-ph') || '');
+      var ph = (site && site.composePlaceholder) || input.getAttribute('data-ph') || '';
       if (ph) {
-        if (!nest && site && site.composePlaceholder) input.setAttribute('data-ph', site.composePlaceholder);
+        input.setAttribute('data-ph', ph);
         input.placeholder = ph;
       }
     }
@@ -1198,9 +1196,7 @@
     if (currentTab === 'new') posts.sort(function (a, b) { return (b.ms || 0) - (a.ms || 0); });
 
     if (!posts.length) {
-      var empty = currentNest
-        ? ('No posts in ' + (currentNest.label || currentNest.slug) + ' yet. This nest is live at /' + currentNest.slug + '. Sign in to post the first take.')
-        : ((site && site.emptyState) || 'This room is empty. Sign in to post. Guest can browse only.');
+      var empty = (site && site.emptyState) || 'This room is empty. Sign in to post. Guest can browse only.';
       el.innerHTML = '<div class="post-empty">' + escapeHtml(empty) + '</div>';
       refreshPorchUi();
       refreshNestSurfaces();
