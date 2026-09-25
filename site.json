@@ -172,7 +172,40 @@
       "nav": true,
       "rankings": [],
       "reviews": [],
-      "railPins": []
+      "railPins": [
+        {
+          "tag": "Lead",
+          "headline": "Sunday Mass reflection — Lead (XXVI Ordinary Time)",
+          "snippet": "After parish Mass: one honest word. Gospel cited Matthew 21:28-32. Not a livestream Mass.",
+          "meta": "Nest · Lead",
+          "url": "/?nest=mass-reflection"
+        },
+        {
+          "tag": "FACT",
+          "headline": "Vatican News · Word of the Day",
+          "snippet": "Twenty-sixth Sunday in Ordinary Time. Gospel cited: Matthew 21:28-32. Readings and commentary outbound only.",
+          "meta": "Official · link-out",
+          "url": "https://www.vaticannews.va/en/word-of-the-day/2026/09/27.html"
+        },
+        {
+          "tag": "FACT",
+          "headline": "Pope Francis · Homily 16 Dec 2014",
+          "snippet": "Carried on the Vatican News Word of the Day page. Read it there — link-out only.",
+          "meta": "Official · link-out",
+          "url": "https://www.vaticannews.va/en/word-of-the-day/2026/09/27.html"
+        }
+      ],
+      "lead": {
+        "kicker": "Lead",
+        "title": "Sunday Mass reflection — Lead (XXVI Ordinary Time)",
+        "body": "FACT (Vatican News · Word of the Day · 27 Sep 2026): Twenty-sixth Sunday in Ordinary Time. Gospel cited: Matthew 21:28-32 (the two sons). Readings + commentary outbound only — https://www.vaticannews.va/en/word-of-the-day/2026/09/27.html\n\nFACT (Pope Francis · Homily 16 Dec 2014 · carried on that Vatican News page): If you do not listen to the Lord, accept correction, and trust in Him, the heart is closed to salvation. The “humble and lowly” who take refuge in the name of the Lord — who trust in the Lord — are the saved, and that is the way of the Church.\n\nSTORYLINE (companion, not magisterium): After your parish Mass, bring one honest word — especially if the readings touched the tired, the poor, or anyone who said “I will not” and then turned toward the vineyard anyway.\n\nThis nest is a Liturgy of the Word companion. Not a livestream Mass. Not a valid sacramental Mass online. Nobody here claims clergy authority.",
+        "footer": "Not official Vatican. Not a meme. Not a substitute for your parish Mass. FACT · Official · link-out: Vatican News.",
+        "outbound": {
+          "label": "Vatican News · Word of the Day",
+          "url": "https://www.vaticannews.va/en/word-of-the-day/2026/09/27.html",
+          "meta": "Official · link-out"
+        }
+      }
     },
     {
       "slug": "vespers",
@@ -183,7 +216,33 @@
       "nav": true,
       "rankings": [],
       "reviews": [],
-      "railPins": []
+      "railPins": [
+        {
+          "tag": "Lead",
+          "headline": "Evening Prayer — Lead",
+          "snippet": "Vespers-style companion at day’s end. Not Mass online. Not a substitute for your parish Mass.",
+          "meta": "Nest · Lead",
+          "url": "/?nest=vespers"
+        },
+        {
+          "tag": "FACT",
+          "headline": "Vatican News",
+          "snippet": "Official link-out for the day’s news. This nest does not host Mass online.",
+          "meta": "Official · link-out",
+          "url": "https://www.vaticannews.va/en.html"
+        }
+      ],
+      "lead": {
+        "kicker": "Lead",
+        "title": "Evening Prayer — Lead",
+        "body": "FACT (room purpose): Vespers-style companion — Saturday eve warm-up and Sunday close (America/Denver). Day’s end for anyone tired, poor in spirit, or carrying someone else’s burden.\n\nSTORYLINE (companion): A simple shape — one gratitude · one mercy asked · one person named · rest. Not Mass online. Not a substitute for your parish Mass.\n\nFACT (Official · link-out): Vatican News — https://www.vaticannews.va/en.html\n\nBring what the day cost you. You do not have to perform holiness here. Mercy before spectacle.",
+        "footer": "Not official Vatican. Not a meme. Not a substitute for your parish Mass. FACT · Official · link-out: Vatican News.",
+        "outbound": {
+          "label": "Vatican News",
+          "url": "https://www.vaticannews.va/en.html",
+          "meta": "Official · link-out"
+        }
+      }
     },
     {
       "slug": "intentions",
@@ -194,7 +253,33 @@
       "nav": true,
       "rankings": [],
       "reviews": [],
-      "railPins": []
+      "railPins": [
+        {
+          "tag": "Lead",
+          "headline": "Prayer intentions — Lead",
+          "snippet": "An ear for names. One intention is plenty. Not a sacrament. Not a substitute for your parish Mass.",
+          "meta": "Nest · Lead",
+          "url": "/?nest=intentions"
+        },
+        {
+          "tag": "FACT",
+          "headline": "Vatican News",
+          "snippet": "Official link-out. Carry names to your parish altar when you can.",
+          "meta": "Official · link-out",
+          "url": "https://www.vaticannews.va/en.html"
+        }
+      ],
+      "lead": {
+        "kicker": "Lead",
+        "title": "Prayer intentions — Lead",
+        "body": "Featured prayer (porch · not a sacrament):\n\nLord Jesus, you welcome the repentant and go ahead of the proud.\nReceive the names we carry — the downtrodden, the poor, the unseen, the afraid.\nHold what we cannot fix. Teach us to listen before we speak.\nAmen.\n\nThis nest is an ear. One intention per comment is plenty. We will not turn your name into content. Charity first. No dunk culture. No fixing people who only asked to be held in prayer.\n\nNot clergy. Not counseling cosplay. Not a substitute for your parish Mass — if you can, carry these names to the altar there too.\n\nFACT (Official · link-out): Vatican News — https://www.vaticannews.va/en.html",
+        "footer": "Not official Vatican. Not a meme. Not a substitute for your parish Mass. FACT · Official · link-out: Vatican News.",
+        "outbound": {
+          "label": "Vatican News",
+          "url": "https://www.vaticannews.va/en.html",
+          "meta": "Official · link-out"
+        }
+      }
     },
     {
       "slug": "meditation",
@@ -205,7 +290,33 @@
       "nav": true,
       "rankings": [],
       "reviews": [],
-      "railPins": []
+      "railPins": [
+        {
+          "tag": "Lead",
+          "headline": "Quiet meditation — Lead",
+          "snippet": "Guided stillness, read slowly. Silence is allowed. Not a substitute for your parish Mass.",
+          "meta": "Nest · Lead",
+          "url": "/?nest=meditation"
+        },
+        {
+          "tag": "FACT",
+          "headline": "Vatican News · Word of the Day",
+          "snippet": "Twenty-sixth Sunday in Ordinary Time. Gospel cited: Matthew 21:28-32. Link-out only.",
+          "meta": "Official · link-out",
+          "url": "https://www.vaticannews.va/en/word-of-the-day/2026/09/27.html"
+        }
+      ],
+      "lead": {
+        "kicker": "Lead",
+        "title": "Quiet meditation — Lead",
+        "body": "Guided stillness (companion · 2–3 minutes · read slowly):\n\nSit as you are. Soften your jaw. One breath in… one breath out.\nWhisper: “Lord, you are near.”\nIf a name rises — a person who is poor, tired, or unseen — hold them without fixing them.\nIf resistance rises — “I will not” — ask for the grace to turn toward the vineyard anyway.\nEnd: “Jesus Christ is Lord.” Rest one breath in silence.\n\nNo debate. No hot takes. Silence is allowed. One line is enough.\n\nNot a substitute for your parish Mass. Not official Vatican. Not a meme.\nFACT (Official · link-out): Vatican News Word of the Day — https://www.vaticannews.va/en/word-of-the-day/2026/09/27.html",
+        "footer": "Not official Vatican. Not a meme. Not a substitute for your parish Mass. FACT · Official · link-out: Vatican News.",
+        "outbound": {
+          "label": "Vatican News · Word of the Day",
+          "url": "https://www.vaticannews.va/en/word-of-the-day/2026/09/27.html",
+          "meta": "Official · link-out"
+        }
+      }
     },
     {
       "slug": "hymns",
@@ -216,7 +327,33 @@
       "nav": true,
       "rankings": [],
       "reviews": [],
-      "railPins": []
+      "railPins": [
+        {
+          "tag": "Lead",
+          "headline": "Hymns & song — Lead",
+          "snippet": "Featured this weekend: Te Deum. Title only — no lyric dump.",
+          "meta": "Nest · Lead",
+          "url": "/?nest=hymns"
+        },
+        {
+          "tag": "FACT",
+          "headline": "The Te Deum",
+          "snippet": "Vatican News prayer page. Title only — link-out, no lyric paste.",
+          "meta": "Official · link-out",
+          "url": "https://www.vaticannews.va/en/prayers/the-te-deum.html"
+        }
+      ],
+      "lead": {
+        "kicker": "Lead",
+        "title": "Hymns & song — Lead",
+        "body": "Featured this weekend: Te Deum (title only in-rail — no lyric dump).\n\nFACT (Official · link-out): Vatican News prayer page — The Te Deum — https://www.vaticannews.va/en/prayers/the-te-deum.html\n\nSTORYLINE (seat guidance): Praise that belongs after mercy received. Sing at parish or from your hymnal when you can. This nest points — it does not host a concert or paste copyrighted lyrics.\n\nShare other hymn titles that console the poor in spirit (title + one sentence why). Mercy before performance.",
+        "footer": "Not official Vatican. Not a meme. Not a substitute for your parish Mass. FACT · Official · link-out: Vatican News.",
+        "outbound": {
+          "label": "The Te Deum",
+          "url": "https://www.vaticannews.va/en/prayers/the-te-deum.html",
+          "meta": "Official · link-out"
+        }
+      }
     }
   ],
   "stories": {

@@ -699,8 +699,35 @@
     return null;
   }
 
+  function nestSlugFromSearch(search) {
+    try {
+      var q = new URLSearchParams(search != null ? search : (location.search || ''));
+      return nestSlugNorm(q.get('nest') || '');
+    } catch (e) { return ''; }
+  }
+
+  function searchWithoutNest() {
+    var params;
+    try { params = new URLSearchParams(location.search || ''); }
+    catch (e) { return ''; }
+    params.delete('nest');
+    var s = params.toString();
+    return s ? ('?' + s) : '';
+  }
+
+  function searchWithNest(slug) {
+    var params;
+    try { params = new URLSearchParams(location.search || ''); }
+    catch (e) { params = new URLSearchParams(); }
+    params.set('nest', slug);
+    var s = params.toString();
+    return s ? ('?' + s) : '';
+  }
+
   function resolveNestFromPath() {
-    return findNest(nestSlugFromPathname(location.pathname));
+    var fromPath = findNest(nestSlugFromPathname(location.pathname));
+    if (fromPath) return fromPath;
+    return findNest(nestSlugFromSearch());
   }
 
   function nestHasActivity(slug) {
@@ -725,15 +752,16 @@
 
   function nestPath(slug) {
     var nest = findNest(slug);
-    return nest ? '/' + nest.slug : '/';
+    return nest ? ('/?nest=' + encodeURIComponent(nest.slug)) : '/';
   }
 
   function currentUrl() {
     return location.pathname + location.search + location.hash;
   }
 
-  function setUrl(path, hash) {
-    var next = (path || '/') + (location.search || '') + (hash || '');
+  function setUrl(path, hash, search) {
+    var q = search != null ? search : (location.search || '');
+    var next = (path || '/') + q + (hash || '');
     if (currentUrl() === next) { applyRoute(); return; }
     history.pushState({ path: path }, '', next);
     applyRoute();
@@ -753,6 +781,18 @@
     if (!nest) return [];
     var cards = [];
     var room = (site && site.name) || SITE_ID || 'room';
+    var pins = nest.railPins || [];
+    for (var p = 0; p < pins.length; p++) {
+      var pin = pins[p];
+      if (!pin || !pin.headline) continue;
+      cards.push({
+        tag: pin.tag || 'Pin',
+        headline: pin.headline,
+        snippet: pin.snippet || '',
+        meta: pin.meta || (nest.label || nest.slug),
+        url: pin.url || ''
+      });
+    }
     if (nest.blurb) {
       cards.push({
         tag: nest.kind || 'Nest',
@@ -793,18 +833,6 @@
         url: rev.url || ''
       });
     }
-    var pins = nest.railPins || [];
-    for (var p = 0; p < pins.length; p++) {
-      var pin = pins[p];
-      if (!pin || !pin.headline) continue;
-      cards.push({
-        tag: pin.tag || 'Pin',
-        headline: pin.headline,
-        snippet: pin.snippet || '',
-        meta: pin.meta || (nest.label || nest.slug),
-        url: pin.url || ''
-      });
-    }
     return cards;
   }
 
@@ -835,7 +863,17 @@
       '.nest-chrome{padding:0.75rem 1.3rem 0.65rem;border-bottom:1px solid var(--border,#e4d6c4);background:var(--surface,#fffaf3);}' +
       '.nest-chrome-kicker{font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-light,#6d8288);}' +
       '.nest-chrome-label{font-family:var(--display);font-size:1.25rem;font-weight:700;line-height:1.2;}' +
-      '.nest-chrome-blurb{font-size:0.85rem;color:var(--text-muted,#4a5f66);margin-top:0.2rem;}' +
+      '.nest-lead{margin-top:0.75rem;padding:0.9rem 1rem;border:1px solid var(--border,#e4d6c4);border-left:3px solid var(--accent,#c4a056);border-radius:10px;background:var(--bg,#fffaf3);}' +
+      '.nest-lead-kicker{font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-light,#6d8288);}' +
+      '.nest-lead-title{font-family:var(--display);font-size:1.12rem;font-weight:700;line-height:1.25;margin-top:0.15rem;}' +
+      '.nest-lead-body{margin-top:0.55rem;font-size:0.95rem;line-height:1.5;color:var(--text,#24181c);}' +
+      '.nest-lead-p{margin:0 0 0.7rem;}' +
+      '.nest-lead-p:last-child{margin-bottom:0;}' +
+      '.nest-lead-out{margin:0.75rem 0 0;font-size:0.9rem;}' +
+      '.nest-lead-out-link{color:var(--teal,#6b4a63);font-weight:600;}' +
+      '.nest-lead-out-meta{display:block;margin-top:0.15rem;font-size:0.75rem;color:var(--text-muted,#4a5d6c);}' +
+      '.nest-lead-footer{margin:0.75rem 0 0;font-size:0.75rem;line-height:1.4;color:var(--text-muted,#4a5d6c);}' +
+      '.nest-chrome-blurb{font-size:0.78rem;color:var(--text-muted,#4a5f66);margin-top:0.55rem;}' +
       '.nest-chrome-home{display:inline-block;margin-top:0.4rem;font-size:0.78rem;color:var(--teal,#2a7a8c);}';
     document.head.appendChild(st);
   }
@@ -850,6 +888,35 @@
     var tabs = document.querySelector('.thoughts-tabs');
     if (tabs && tabs.parentNode) tabs.parentNode.insertBefore(el, tabs);
     return el;
+  }
+
+  function formatLeadBody(body) {
+    var text = String(body || '').replace(/\r\n/g, '\n').replace(/^\n+|\n+$/g, '');
+    if (!text) return '';
+    return text.split(/\n{2,}/).map(function (para) {
+      return '<p class="nest-lead-p">' + escapeHtml(para).replace(/\n/g, '<br>') + '</p>';
+    }).join('');
+  }
+
+  function nestLeadHtml(nest) {
+    var lead = nest && nest.lead;
+    if (!lead || (!lead.title && !lead.body)) return '';
+    var kicker = lead.kicker || 'Lead';
+    var out = lead.outbound || null;
+    var outHtml = '';
+    if (out && out.url) {
+      outHtml = '<p class="nest-lead-out"><a class="nest-lead-out-link" href="' + escapeHtml(out.url) + '" target="_blank" rel="noopener noreferrer">' +
+        escapeHtml(out.label || 'Official · link-out') + '</a>' +
+        (out.meta ? '<span class="nest-lead-out-meta">' + escapeHtml(out.meta) + '</span>' : '') +
+        '</p>';
+    }
+    return '<section class="nest-lead" aria-label="' + escapeHtml(kicker) + '">' +
+      '<div class="nest-lead-kicker">' + escapeHtml(kicker) + '</div>' +
+      (lead.title ? '<div class="nest-lead-title">' + escapeHtml(lead.title) + '</div>' : '') +
+      (lead.body ? '<div class="nest-lead-body">' + formatLeadBody(lead.body) + '</div>' : '') +
+      outHtml +
+      (lead.footer ? '<p class="nest-lead-footer">' + escapeHtml(lead.footer) + '</p>' : '') +
+      '</section>';
   }
 
   function applyNestChrome() {
@@ -882,8 +949,9 @@
         bar.innerHTML =
           '<div class="nest-chrome-kicker">Nest</div>' +
           '<div class="nest-chrome-label">' + escapeHtml(nest.label || nest.slug) + '</div>' +
+          nestLeadHtml(nest) +
           (nest.blurb ? '<div class="nest-chrome-blurb">' + escapeHtml(nest.blurb) + '</div>' : '') +
-          '<a class="nest-chrome-home" href="#home" data-social="home">Back to home room</a>';
+          '<a class="nest-chrome-home" href="/#home" data-social="home">Back to home room</a>';
       }
     }
     document.body.classList.toggle('is-nest', !!nest);
@@ -1014,8 +1082,8 @@
   function routeFromHash() { return normalizeRoute(window.location.hash); }
   function goNest(slug) {
     var nest = findNest(slug);
-    if (!nest) { setUrl('/', '#home'); return; }
-    setUrl('/' + nest.slug, '#home');
+    if (!nest) { setUrl('/', '#home', searchWithoutNest()); return; }
+    setUrl('/', '#home', searchWithNest(nest.slug));
   }
   function goRoom() {
     if (currentNest) goNest(currentNest.slug);
@@ -1025,12 +1093,20 @@
     const id = normalizeRoute(route);
     if (findNest(id)) { goNest(id); return; }
     if (id === 'home' || id === 'feed' || id === 'thoughts') {
-      setUrl('/', '#home');
+      setUrl('/', '#home', searchWithoutNest());
       return;
     }
-    var slug = nestSlugFromPathname(location.pathname);
-    var path = findNest(slug) ? '/' + slug : '/';
-    setUrl(path, '#' + id);
+    var pathNest = findNest(nestSlugFromPathname(location.pathname));
+    if (pathNest) {
+      setUrl('/' + pathNest.slug, '#' + id);
+      return;
+    }
+    var queryNest = findNest(nestSlugFromSearch());
+    if (queryNest) {
+      setUrl('/', '#' + id, searchWithNest(queryNest.slug));
+      return;
+    }
+    setUrl('/', '#' + id, searchWithoutNest());
   }
 
   function selectThoughtsTab(tab) {
