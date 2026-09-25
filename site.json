@@ -446,13 +446,27 @@
     "title": "Room Brief",
     "kicker": "Urbi et orbi",
     "meta": "From the source",
-    "footer": "Vatican News as a link. Not a lectionary paste. Ads off. Not official Vatican. Not a meme.",
+    "footer": "Vatican News as a link. Not a lectionary paste. Ads off. Not official Vatican. Not a meme. Watch Mass live via official outbound only. Not hosted here. Not a substitute for parish Mass when you can go.",
     "outbound": [
       {
         "tag": "Vatican",
         "headline": "Vatican News",
         "snippet": "The office, the letters, from the source.",
         "url": "https://www.vaticannews.va/en.html",
+        "meta": "Official · link-out"
+      },
+      {
+        "tag": "Vatican",
+        "headline": "Vatican Media Live",
+        "url": "https://www.youtube.com/user/vatican/live",
+        "snippet": "Official papal Masses/celebrations — live when on air. Outbound only; we do not host.",
+        "meta": "Official · link-out"
+      },
+      {
+        "tag": "Mass",
+        "headline": "EWTN Daily Mass",
+        "url": "https://www.ewtn.com/tv/watch-live/united-states",
+        "snippet": "Free official stream; Daily Mass ~8 a.m. ET (Irondale). Outbound only; we do not host.",
         "meta": "Official · link-out"
       }
     ],
