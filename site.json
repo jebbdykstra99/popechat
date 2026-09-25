@@ -205,6 +205,12 @@
           "url": "https://www.vaticannews.va/en/word-of-the-day/2026/09/27.html",
           "meta": "Official · link-out"
         }
+      },
+      "audio": {
+        "vendor": "browser-webspeech",
+        "rate": 0.95,
+        "text": "This is a Sunday Mass reflection companion for after your parish Mass. Today’s Gospel is the parable of the two sons — Matthew chapter twenty-one. If you said “I will not,” and then turned toward mercy anyway — you belong here. Bring one honest word. Not a livestream Mass. Not official Vatican.",
+        "honesty": "Browser voice · not official Vatican audio · not a Mass substitute"
       }
     },
     {
@@ -242,6 +248,12 @@
           "url": "https://www.vaticannews.va/en.html",
           "meta": "Official · link-out"
         }
+      },
+      "audio": {
+        "vendor": "browser-webspeech",
+        "rate": 0.92,
+        "text": "Evening Prayer companion. One gratitude. One mercy asked. One person named. Rest. Not Mass online. Not a substitute for your parish Mass. Go in peace.",
+        "honesty": "Browser voice · not official Vatican audio · not a Mass substitute"
       }
     },
     {
@@ -279,6 +291,12 @@
           "url": "https://www.vaticannews.va/en.html",
           "meta": "Official · link-out"
         }
+      },
+      "audio": {
+        "vendor": "browser-webspeech",
+        "rate": 0.9,
+        "text": "Lord Jesus, you welcome the repentant and go ahead of the proud. Receive the names we carry — the downtrodden, the poor, the unseen, the afraid. Hold what we cannot fix. Teach us to listen before we speak. Amen.",
+        "honesty": "Browser voice · not official Vatican audio · not a Mass substitute"
       }
     },
     {
@@ -316,6 +334,12 @@
           "url": "https://www.vaticannews.va/en/word-of-the-day/2026/09/27.html",
           "meta": "Official · link-out"
         }
+      },
+      "audio": {
+        "vendor": "browser-webspeech",
+        "rate": 0.82,
+        "text": "Sit as you are. Soften your jaw. One breath in. One breath out. Lord, you are near. If a name rises — a person who is poor, tired, or unseen — hold them without fixing them. If resistance rises — I will not — ask for the grace to turn toward the vineyard anyway. Jesus Christ is Lord. Rest one breath in silence.",
+        "honesty": "Browser voice · not official Vatican audio · not a Mass substitute"
       }
     },
     {
@@ -352,6 +376,19 @@
           "label": "The Te Deum",
           "url": "https://www.vaticannews.va/en/prayers/the-te-deum.html",
           "meta": "Official · link-out"
+        }
+      },
+      "audio": {
+        "vendor": "browser-webspeech",
+        "rate": 0.85,
+        "text": "Te Deum laudamus: te Dominum confitemur. Te aeternum Patrem omnis terra veneratur. Tibi omnes Angeli, tibi caeli et universae potestates: tibi Cherubim et Seraphim incessabili voce proclamant: Sanctus, Sanctus, Sanctus, Dominus Deus Sabaoth.",
+        "honesty": "Browser voice · not official Vatican audio · not a Mass substitute",
+        "lang": "la",
+        "optionalInstrumental": {
+          "id": "HYMN-002",
+          "label": "Charpentier prelude · PD dedication · not Vatican",
+          "url": "https://upload.wikimedia.org/wikipedia/commons/4/41/Charpentier%2C_Te_Deum_%28Prelude%29.ogg",
+          "note": "Hotlink/stream only. Wave-2 pack path /5/5b/ returns 404; this is the same Commons file (CC0) at the canonical /4/41/ path. If playback fails, skip and keep Latin TTS."
         }
       }
     }

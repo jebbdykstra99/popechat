@@ -15,6 +15,14 @@
   let NESTS = [];
   let currentNest = null;
   var paintedNestSlug = null;
+  var nestVoice = {
+    mode: '',
+    slug: '',
+    utterance: null,
+    audio: null,
+    keep: null,
+    preludeBlocked: false
+  };
 
   var NEST_RESERVED = {
     '': 1, home: 1, feed: 1, thoughts: 1, following: 1, explore: 1,
@@ -861,8 +869,21 @@
       '.nav-nests-label{padding:0.35rem 1.5rem 0.15rem;font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--nav-text);opacity:0.75;}' +
       '.nav-nests .nav-social-link{font-size:0.88rem;padding:0.35rem 1.5rem;min-height:38px;}' +
       '.nest-chrome{padding:0.75rem 1.3rem 0.65rem;border-bottom:1px solid var(--border,#e4d6c4);background:var(--surface,#fffaf3);}' +
+      '.nest-chrome-head{display:flex;align-items:flex-end;justify-content:space-between;gap:0.85rem;}' +
+      '.nest-chrome-titles{min-width:0;flex:1 1 auto;}' +
       '.nest-chrome-kicker{font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-light,#6d8288);}' +
       '.nest-chrome-label{font-family:var(--display);font-size:1.25rem;font-weight:700;line-height:1.2;}' +
+      '.nest-listen{flex:0 1 16.5rem;display:flex;flex-direction:column;align-items:flex-end;gap:0.28rem;text-align:right;margin:0 0 0.1rem 0.5rem;}' +
+      '.nest-listen-btn{appearance:none;-webkit-appearance:none;border:1px solid #3b1848;background:#fffaf3;color:#3b1848;font-family:var(--ui,Inter,system-ui,sans-serif);font-size:0.82rem;font-weight:600;letter-spacing:0.01em;padding:0.4rem 0.95rem;border-radius:999px;cursor:pointer;line-height:1.2;}' +
+      '.nest-listen-btn:hover{background:#3b1848;color:#fbf7f0;}' +
+      '.nest-listen-btn[aria-pressed="true"]{background:#3b1848;color:#f6f0e6;}' +
+      '.nest-listen-btn:focus-visible{outline:2px solid var(--accent,#c4a056);outline-offset:2px;}' +
+      '.nest-listen-btn:disabled,.nest-listen-btn.is-unavailable{opacity:0.8;cursor:not-allowed;background:transparent;color:var(--text-muted,#4a5d6c);border-color:var(--border,#c9d5de);font-weight:600;font-size:0.72rem;max-width:16rem;white-space:normal;text-align:right;}' +
+      '.nest-listen-honesty{margin:0;max-width:16.5rem;font-size:0.68rem;line-height:1.35;color:var(--text-muted,#4a5d6c);}' +
+      '.nest-listen-prelude{appearance:none;-webkit-appearance:none;background:transparent;border:0;padding:0;margin:0;font-family:inherit;font-size:0.72rem;font-weight:600;line-height:1.35;color:#3b1848;text-decoration:underline;text-underline-offset:2px;cursor:pointer;text-align:right;max-width:16.5rem;}' +
+      '.nest-listen-prelude[aria-pressed="true"]{color:var(--accent-dark,#9a7c3a);}' +
+      '.nest-listen-prelude:focus-visible{outline:2px solid var(--accent,#c4a056);outline-offset:2px;}' +
+      '@media (max-width:720px){.nest-chrome-head{flex-direction:column;align-items:stretch;gap:0.55rem;}.nest-listen,.nest-listen-btn:disabled{align-items:flex-start;text-align:left;}.nest-listen{margin:0.15rem 0 0;flex-basis:auto;}.nest-listen-prelude{text-align:left;}}' +
       '.nest-lead{margin-top:0.75rem;padding:0.9rem 1rem;border:1px solid var(--border,#e4d6c4);border-left:3px solid var(--accent,#c4a056);border-radius:10px;background:var(--bg,#fffaf3);}' +
       '.nest-lead-kicker{font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-light,#6d8288);}' +
       '.nest-lead-title{font-family:var(--display);font-size:1.12rem;font-weight:700;line-height:1.25;margin-top:0.15rem;}' +
@@ -887,6 +908,7 @@
     el.hidden = true;
     var tabs = document.querySelector('.thoughts-tabs');
     if (tabs && tabs.parentNode) tabs.parentNode.insertBefore(el, tabs);
+    bindNestListen(el);
     return el;
   }
 
@@ -919,6 +941,281 @@
       '</section>';
   }
 
+  function browserVoiceSupported() {
+    try {
+      return typeof window.speechSynthesis !== 'undefined' && typeof window.SpeechSynthesisUtterance === 'function';
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function nestAudioOf(nest) {
+    var audio = nest && nest.audio;
+    if (!audio || !String(audio.text || '').trim()) return null;
+    return audio;
+  }
+
+  function nestHonesty(audio) {
+    return (audio && audio.honesty) || 'Browser voice · not official Vatican audio · not a Mass substitute';
+  }
+
+  function oggMaybe() {
+    try {
+      var el = document.createElement('audio');
+      if (!el.canPlayType) return false;
+      var t = el.canPlayType('audio/ogg; codecs="vorbis"') || el.canPlayType('audio/ogg');
+      return t === 'probably' || t === 'maybe';
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function stopNestVoiceKeep() {
+    if (nestVoice.keep) {
+      clearInterval(nestVoice.keep);
+      nestVoice.keep = null;
+    }
+  }
+
+  function stopNestPrelude() {
+    var player = nestVoice.audio;
+    nestVoice.audio = null;
+    if (!player) return;
+    try { player.pause(); } catch (e) {}
+    try {
+      player.removeAttribute('src');
+      player.load();
+    } catch (e2) {}
+  }
+
+  function stopNestTts() {
+    stopNestVoiceKeep();
+    nestVoice.utterance = null;
+    if (window.speechSynthesis) {
+      try { window.speechSynthesis.cancel(); } catch (e) {}
+    }
+  }
+
+  function syncNestListenUi() {
+    var nest = currentNest;
+    var btn = document.getElementById('nest-listen-btn');
+    if (btn && !btn.disabled && nest) {
+      var playing = nestVoice.mode === 'tts' && nestVoice.slug === nest.slug;
+      var label = nest.label || nest.slug;
+      btn.setAttribute('aria-pressed', playing ? 'true' : 'false');
+      btn.textContent = playing ? 'Stop' : 'Listen';
+      btn.setAttribute('aria-label', playing
+        ? ('Stop browser voice for ' + label)
+        : ('Listen to ' + label + '. Browser voice, not official Vatican audio, not a Mass substitute.'));
+    }
+    var pre = document.getElementById('nest-listen-prelude');
+    if (pre && nest) {
+      var on = nestVoice.mode === 'prelude' && nestVoice.slug === nest.slug;
+      var opt = nest.audio && nest.audio.optionalInstrumental;
+      var honest = (opt && opt.label) || 'Optional instrumental · not Vatican';
+      pre.setAttribute('aria-pressed', on ? 'true' : 'false');
+      pre.textContent = on ? 'Stop prelude' : honest;
+      pre.setAttribute('aria-label', (on ? 'Stop. ' : 'Play. ') + honest);
+    }
+  }
+
+  function stopNestVoice() {
+    stopNestTts();
+    stopNestPrelude();
+    nestVoice.mode = '';
+    nestVoice.slug = '';
+    syncNestListenUi();
+  }
+
+  function pickVoice(lang) {
+    if (!lang || !window.speechSynthesis || !window.speechSynthesis.getVoices) return null;
+    var voices = [];
+    try { voices = window.speechSynthesis.getVoices() || []; } catch (e) { return null; }
+    var want = String(lang).toLowerCase();
+    for (var i = 0; i < voices.length; i++) {
+      var vl = String(voices[i].lang || '').toLowerCase();
+      if (vl === want || vl.indexOf(want + '-') === 0) return voices[i];
+    }
+    return null;
+  }
+
+  function startNestTts(nest) {
+    var audio = nestAudioOf(nest);
+    if (!audio || !browserVoiceSupported()) return;
+    stopNestPrelude();
+    stopNestTts();
+    var u = new SpeechSynthesisUtterance(audio.text);
+    if (typeof audio.rate === 'number' && isFinite(audio.rate)) u.rate = audio.rate;
+    if (audio.lang) {
+      u.lang = audio.lang;
+      var voice = pickVoice(audio.lang);
+      if (voice) u.voice = voice;
+    }
+    u.onend = function () {
+      if (nestVoice.utterance !== u) return;
+      nestVoice.utterance = null;
+      nestVoice.mode = '';
+      nestVoice.slug = '';
+      stopNestVoiceKeep();
+      syncNestListenUi();
+    };
+    u.onerror = function () {
+      if (nestVoice.utterance !== u) return;
+      nestVoice.utterance = null;
+      nestVoice.mode = '';
+      nestVoice.slug = '';
+      stopNestVoiceKeep();
+      syncNestListenUi();
+    };
+    nestVoice.mode = 'tts';
+    nestVoice.slug = nest.slug;
+    nestVoice.utterance = u;
+    try {
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(u);
+    } catch (e) {
+      nestVoice.mode = '';
+      nestVoice.slug = '';
+      nestVoice.utterance = null;
+      syncNestListenUi();
+      return;
+    }
+    stopNestVoiceKeep();
+    nestVoice.keep = setInterval(function () {
+      var synth = window.speechSynthesis;
+      if (!synth || nestVoice.mode !== 'tts') {
+        stopNestVoiceKeep();
+        return;
+      }
+      if (!synth.speaking && !synth.pending) return;
+      try {
+        synth.pause();
+        synth.resume();
+      } catch (err) {}
+    }, 10000);
+    syncNestListenUi();
+  }
+
+  function toggleNestTts() {
+    if (!currentNest || !browserVoiceSupported()) return;
+    if (nestVoice.mode === 'tts' && nestVoice.slug === currentNest.slug) {
+      stopNestVoice();
+      return;
+    }
+    startNestTts(currentNest);
+  }
+
+  function dropPreludeControl() {
+    nestVoice.preludeBlocked = true;
+    var pre = document.getElementById('nest-listen-prelude');
+    if (pre && pre.parentNode) pre.parentNode.removeChild(pre);
+  }
+
+  function startNestPrelude(nest) {
+    var audioCfg = nestAudioOf(nest);
+    var opt = audioCfg && audioCfg.optionalInstrumental;
+    if (!opt || !opt.url || nestVoice.preludeBlocked || !oggMaybe()) return;
+    stopNestTts();
+    stopNestPrelude();
+    var player = new Audio();
+    player.preload = 'auto';
+    nestVoice.audio = player;
+    nestVoice.mode = 'prelude';
+    nestVoice.slug = nest.slug;
+    player.addEventListener('ended', function () {
+      if (nestVoice.audio !== player) return;
+      nestVoice.audio = null;
+      nestVoice.mode = '';
+      nestVoice.slug = '';
+      syncNestListenUi();
+    });
+    player.addEventListener('error', function () {
+      if (nestVoice.audio !== player) return;
+      stopNestPrelude();
+      nestVoice.mode = '';
+      nestVoice.slug = '';
+      dropPreludeControl();
+    });
+    try { player.src = opt.url; } catch (e) {
+      nestVoice.audio = null;
+      nestVoice.mode = '';
+      nestVoice.slug = '';
+      dropPreludeControl();
+      return;
+    }
+    var played;
+    try { played = player.play(); } catch (e2) {
+      stopNestPrelude();
+      nestVoice.mode = '';
+      nestVoice.slug = '';
+      dropPreludeControl();
+      return;
+    }
+    if (played && typeof played.catch === 'function') {
+      played.catch(function () {
+        if (nestVoice.audio !== player) return;
+        stopNestPrelude();
+        nestVoice.mode = '';
+        nestVoice.slug = '';
+        dropPreludeControl();
+      });
+    }
+    syncNestListenUi();
+  }
+
+  function toggleNestPrelude() {
+    if (!currentNest) return;
+    if (nestVoice.mode === 'prelude' && nestVoice.slug === currentNest.slug) {
+      stopNestVoice();
+      return;
+    }
+    startNestPrelude(currentNest);
+  }
+
+  function nestListenHtml(nest) {
+    var audio = nestAudioOf(nest);
+    if (!audio) return '';
+    var label = nest.label || nest.slug;
+    var supported = browserVoiceSupported();
+    var btn;
+    if (!supported) {
+      btn = '<button type="button" class="nest-listen-btn is-unavailable" id="nest-listen-btn" disabled aria-disabled="true">Voice unavailable in this browser</button>';
+    } else {
+      var playing = nestVoice.mode === 'tts' && nestVoice.slug === nest.slug;
+      btn = '<button type="button" class="nest-listen-btn" id="nest-listen-btn" data-nest-listen="tts" aria-pressed="' +
+        (playing ? 'true' : 'false') + '" aria-label="' +
+        escapeHtml(playing
+          ? ('Stop browser voice for ' + label)
+          : ('Listen to ' + label + '. Browser voice, not official Vatican audio, not a Mass substitute.')) +
+        '">' + (playing ? 'Stop' : 'Listen') + '</button>';
+    }
+    var extra = '';
+    var opt = audio.optionalInstrumental;
+    if (opt && opt.url && !nestVoice.preludeBlocked && oggMaybe()) {
+      var on = nestVoice.mode === 'prelude' && nestVoice.slug === nest.slug;
+      var honest = opt.label || 'Optional instrumental · not Vatican';
+      extra = '<button type="button" class="nest-listen-prelude" id="nest-listen-prelude" data-nest-listen="prelude" aria-pressed="' +
+        (on ? 'true' : 'false') + '" aria-label="' + escapeHtml((on ? 'Stop. ' : 'Play. ') + honest) + '">' +
+        escapeHtml(on ? 'Stop prelude' : honest) + '</button>';
+    }
+    var note = supported
+      ? ('<p class="nest-listen-honesty">' + escapeHtml(nestHonesty(audio)) + '</p>')
+      : '';
+    return '<div class="nest-listen">' + btn + note + extra + '</div>';
+  }
+
+  function bindNestListen(el) {
+    if (!el || el.getAttribute('data-listen-bound') === '1') return;
+    el.setAttribute('data-listen-bound', '1');
+    el.addEventListener('click', function (ev) {
+      var t = ev.target && ev.target.closest ? ev.target.closest('[data-nest-listen]') : null;
+      if (!t || t.disabled) return;
+      var kind = t.getAttribute('data-nest-listen');
+      if (kind === 'tts') toggleNestTts();
+      else if (kind === 'prelude') toggleNestPrelude();
+    });
+  }
+
   function applyNestChrome() {
     ensureNestCss();
     var nest = currentNest;
@@ -941,17 +1238,25 @@
     }
     var bar = ensureNestChrome();
     if (bar) {
+      var nextSlug = nest ? nest.slug : '';
+      if (nestVoice.slug && nestVoice.slug !== nextSlug) stopNestVoice();
       if (!nest) {
         bar.hidden = true;
         bar.innerHTML = '';
       } else {
         bar.hidden = false;
         bar.innerHTML =
-          '<div class="nest-chrome-kicker">Nest</div>' +
-          '<div class="nest-chrome-label">' + escapeHtml(nest.label || nest.slug) + '</div>' +
+          '<div class="nest-chrome-head">' +
+            '<div class="nest-chrome-titles">' +
+              '<div class="nest-chrome-kicker">Nest</div>' +
+              '<div class="nest-chrome-label">' + escapeHtml(nest.label || nest.slug) + '</div>' +
+            '</div>' +
+            nestListenHtml(nest) +
+          '</div>' +
           nestLeadHtml(nest) +
           (nest.blurb ? '<div class="nest-chrome-blurb">' + escapeHtml(nest.blurb) + '</div>' : '') +
           '<a class="nest-chrome-home" href="/#home" data-social="home">Back to home room</a>';
+        syncNestListenUi();
       }
     }
     document.body.classList.toggle('is-nest', !!nest);
@@ -4898,6 +5203,7 @@
 
     window.addEventListener('hashchange', applyRoute);
     window.addEventListener('popstate', applyRoute);
+    window.addEventListener('pagehide', stopNestVoice);
     try { deepPostId = new URLSearchParams(location.search).get('p') || ''; } catch (e) { deepPostId = ''; }
     restoreBouncedPath();
     if (!location.hash || location.hash === '#') {
