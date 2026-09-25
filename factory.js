@@ -869,21 +869,21 @@
       '.nav-nests-label{padding:0.35rem 1.5rem 0.15rem;font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--nav-text);opacity:0.75;}' +
       '.nav-nests .nav-social-link{font-size:0.88rem;padding:0.35rem 1.5rem;min-height:38px;}' +
       '.nest-chrome{padding:0.75rem 1.3rem 0.65rem;border-bottom:1px solid var(--border,#e4d6c4);background:var(--surface,#fffaf3);}' +
-      '.nest-chrome-head{display:flex;align-items:flex-end;justify-content:space-between;gap:0.85rem;}' +
-      '.nest-chrome-titles{min-width:0;flex:1 1 auto;}' +
+      '.nest-chrome-head{display:block;}' +
       '.nest-chrome-kicker{font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-light,#6d8288);}' +
-      '.nest-chrome-label{font-family:var(--display);font-size:1.25rem;font-weight:700;line-height:1.2;}' +
-      '.nest-listen{flex:0 1 16.5rem;display:flex;flex-direction:column;align-items:flex-end;gap:0.28rem;text-align:right;margin:0 0 0.1rem 0.5rem;}' +
-      '.nest-listen-btn{appearance:none;-webkit-appearance:none;border:1px solid #3b1848;background:#fffaf3;color:#3b1848;font-family:var(--ui,Inter,system-ui,sans-serif);font-size:0.82rem;font-weight:600;letter-spacing:0.01em;padding:0.4rem 0.95rem;border-radius:999px;cursor:pointer;line-height:1.2;}' +
+      '.nest-chrome-titleline{display:flex;align-items:center;justify-content:space-between;gap:0.85rem;}' +
+      '.nest-chrome-label{font-family:var(--display);font-size:1.25rem;font-weight:700;line-height:1.2;min-width:0;}' +
+      '.nest-listen-btn{appearance:none;-webkit-appearance:none;flex:0 0 auto;border:1px solid #3b1848;background:#fffaf3;color:#3b1848;font-family:var(--ui,Inter,system-ui,sans-serif);font-size:0.82rem;font-weight:600;letter-spacing:0.01em;padding:0.4rem 0.95rem;border-radius:999px;cursor:pointer;line-height:1.2;}' +
       '.nest-listen-btn:hover{background:#3b1848;color:#fbf7f0;}' +
       '.nest-listen-btn[aria-pressed="true"]{background:#3b1848;color:#f6f0e6;}' +
       '.nest-listen-btn:focus-visible{outline:2px solid var(--accent,#c4a056);outline-offset:2px;}' +
-      '.nest-listen-btn:disabled,.nest-listen-btn.is-unavailable{opacity:0.8;cursor:not-allowed;background:transparent;color:var(--text-muted,#4a5d6c);border-color:var(--border,#c9d5de);font-weight:600;font-size:0.72rem;max-width:16rem;white-space:normal;text-align:right;}' +
-      '.nest-listen-honesty{margin:0;max-width:16.5rem;font-size:0.68rem;line-height:1.35;color:var(--text-muted,#4a5d6c);}' +
-      '.nest-listen-prelude{appearance:none;-webkit-appearance:none;background:transparent;border:0;padding:0;margin:0;font-family:inherit;font-size:0.72rem;font-weight:600;line-height:1.35;color:#3b1848;text-decoration:underline;text-underline-offset:2px;cursor:pointer;text-align:right;max-width:16.5rem;}' +
+      '.nest-listen-btn:disabled,.nest-listen-btn.is-unavailable{opacity:0.8;cursor:not-allowed;background:transparent;color:var(--text-muted,#4a5d6c);border-color:var(--border,#c9d5de);font-weight:600;font-size:0.72rem;max-width:14rem;white-space:normal;text-align:right;}' +
+      '.nest-listen-meta{display:flex;flex-direction:column;align-items:flex-end;gap:0.22rem;margin-top:0.35rem;text-align:right;}' +
+      '.nest-listen-honesty{margin:0;max-width:18rem;font-size:0.68rem;line-height:1.35;color:var(--text-muted,#4a5d6c);}' +
+      '.nest-listen-prelude{appearance:none;-webkit-appearance:none;background:transparent;border:0;padding:0;margin:0;font-family:inherit;font-size:0.72rem;font-weight:600;line-height:1.35;color:#3b1848;text-decoration:underline;text-underline-offset:2px;cursor:pointer;text-align:right;max-width:18rem;}' +
       '.nest-listen-prelude[aria-pressed="true"]{color:var(--accent-dark,#9a7c3a);}' +
       '.nest-listen-prelude:focus-visible{outline:2px solid var(--accent,#c4a056);outline-offset:2px;}' +
-      '@media (max-width:720px){.nest-chrome-head{flex-direction:column;align-items:stretch;gap:0.55rem;}.nest-listen,.nest-listen-btn:disabled{align-items:flex-start;text-align:left;}.nest-listen{margin:0.15rem 0 0;flex-basis:auto;}.nest-listen-prelude{text-align:left;}}' +
+      '@media (max-width:720px){.nest-chrome-titleline{flex-direction:column;align-items:flex-start;gap:0.45rem;}.nest-listen-btn:disabled{text-align:left;}.nest-listen-meta,.nest-listen-prelude{align-items:flex-start;text-align:left;}}' +
       '.nest-lead{margin-top:0.75rem;padding:0.9rem 1rem;border:1px solid var(--border,#e4d6c4);border-left:3px solid var(--accent,#c4a056);border-radius:10px;background:var(--bg,#fffaf3);}' +
       '.nest-lead-kicker{font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-light,#6d8288);}' +
       '.nest-lead-title{font-family:var(--display);font-size:1.12rem;font-weight:700;line-height:1.25;margin-top:0.15rem;}' +
@@ -1049,7 +1049,9 @@
     if (audio.lang) {
       u.lang = audio.lang;
       var voice = pickVoice(audio.lang);
-      if (voice) u.voice = voice;
+      if (voice) {
+        try { u.voice = voice; } catch (e) {}
+      }
     }
     u.onend = function () {
       if (nestVoice.utterance !== u) return;
@@ -1071,7 +1073,6 @@
     nestVoice.slug = nest.slug;
     nestVoice.utterance = u;
     try {
-      window.speechSynthesis.cancel();
       window.speechSynthesis.speak(u);
     } catch (e) {
       nestVoice.mode = '';
@@ -1172,9 +1173,9 @@
     startNestPrelude(currentNest);
   }
 
-  function nestListenHtml(nest) {
+  function nestListenParts(nest) {
     var audio = nestAudioOf(nest);
-    if (!audio) return '';
+    if (!audio) return { button: '', notes: '' };
     var label = nest.label || nest.slug;
     var supported = browserVoiceSupported();
     var btn;
@@ -1201,7 +1202,8 @@
     var note = supported
       ? ('<p class="nest-listen-honesty">' + escapeHtml(nestHonesty(audio)) + '</p>')
       : '';
-    return '<div class="nest-listen">' + btn + note + extra + '</div>';
+    var notes = (note || extra) ? ('<div class="nest-listen-meta">' + note + extra + '</div>') : '';
+    return { button: btn, notes: notes };
   }
 
   function bindNestListen(el) {
@@ -1245,14 +1247,16 @@
         bar.innerHTML = '';
       } else {
         bar.hidden = false;
+        var listen = nestListenParts(nest);
         bar.innerHTML =
           '<div class="nest-chrome-head">' +
-            '<div class="nest-chrome-titles">' +
-              '<div class="nest-chrome-kicker">Nest</div>' +
+            '<div class="nest-chrome-kicker">Nest</div>' +
+            '<div class="nest-chrome-titleline">' +
               '<div class="nest-chrome-label">' + escapeHtml(nest.label || nest.slug) + '</div>' +
+              listen.button +
             '</div>' +
-            nestListenHtml(nest) +
           '</div>' +
+          listen.notes +
           nestLeadHtml(nest) +
           (nest.blurb ? '<div class="nest-chrome-blurb">' + escapeHtml(nest.blurb) + '</div>' : '') +
           '<a class="nest-chrome-home" href="/#home" data-social="home">Back to home room</a>';
