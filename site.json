@@ -208,7 +208,7 @@
       },
       "audio": {
         "vendor": "kokoro",
-        "voice": "bm_george",
+        "voice": "af_bella",
         "rate": 0.75,
         "text": "This is a Sunday Mass reflection companion for after your parish Mass. Today’s Gospel is the parable of the two sons — Matthew chapter twenty-one. If you said “I will not,” and then turned toward mercy anyway — you belong here. Bring one honest word. Not a livestream Mass. Not official Vatican.",
         "honesty": "Synthesized voice · not official Vatican audio · not a Mass substitute · preview"
@@ -252,7 +252,7 @@
       },
       "audio": {
         "vendor": "kokoro",
-        "voice": "bm_george",
+        "voice": "af_bella",
         "rate": 0.75,
         "text": "Evening Prayer companion. One gratitude. One mercy asked. One person named. Rest. Not Mass online. Not a substitute for your parish Mass. Go in peace.",
         "honesty": "Synthesized voice · not official Vatican audio · not a Mass substitute · preview"
@@ -296,7 +296,7 @@
       },
       "audio": {
         "vendor": "kokoro",
-        "voice": "bm_george",
+        "voice": "af_bella",
         "rate": 0.75,
         "text": "Lord Jesus, you welcome the repentant and go ahead of the proud. Receive the names we carry — the downtrodden, the poor, the unseen, the afraid. Hold what we cannot fix. Teach us to listen before we speak. Amen.",
         "honesty": "Synthesized voice · not official Vatican audio · not a Mass substitute · preview"
@@ -340,7 +340,7 @@
       },
       "audio": {
         "vendor": "kokoro",
-        "voice": "bm_george",
+        "voice": "af_bella",
         "rate": 0.75,
         "text": "Sit as you are. Soften your jaw. One breath in. One breath out. Lord, you are near. If a name rises — a person who is poor, tired, or unseen — hold them without fixing them. If resistance rises — I will not — ask for the grace to turn toward the vineyard anyway. Jesus Christ is Lord. Rest one breath in silence.",
         "honesty": "Synthesized voice · not official Vatican audio · not a Mass substitute · preview"
@@ -384,7 +384,7 @@
       },
       "audio": {
         "vendor": "kokoro",
-        "voice": "bm_george",
+        "voice": "af_bella",
         "rate": 0.75,
         "lang": "en",
         "text": "Hymns companion. Featured this weekend: Te Deum — we praise you, O God. This voice speaks English. It is not sung Latin, and it is not a perfect liturgy. Sing at your parish or from your hymnal when you can.",
@@ -710,5 +710,29 @@
       ],
       "dwellMs": 9000
     }
+  },
+  "nestListen": {
+    "vendor": "kokoro",
+    "rate": 0.75,
+    "defaultRotation": [
+      {
+        "id": "af_bella",
+        "weight": 60
+      },
+      {
+        "id": "bm_george",
+        "weight": 40
+      }
+    ],
+    "excludeFromDefault": [
+      "af_heart"
+    ],
+    "picker": [
+      "af_heart",
+      "af_bella",
+      "bf_emma",
+      "bm_george"
+    ],
+    "note": "Sticky per session: first Listen rolls 60/40 Bella/George; Heart picker-only"
   }
 }
