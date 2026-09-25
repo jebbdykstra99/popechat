@@ -889,12 +889,18 @@
       '.nest-listen-btn:focus-visible{outline:2px solid var(--accent,#c4a056);outline-offset:2px;}' +
       '.nest-listen-btn:disabled,.nest-listen-btn.is-unavailable{opacity:0.8;cursor:not-allowed;background:transparent;color:var(--text-muted,#4a5d6c);border-color:var(--border,#c9d5de);font-weight:600;font-size:0.72rem;max-width:14rem;white-space:normal;text-align:right;}' +
       '.nest-listen-btn.is-busy{font-size:0.72rem;max-width:12.5rem;white-space:normal;text-align:right;}' +
+      '.nest-listen-tools{display:flex;flex-direction:column;align-items:flex-end;gap:0.35rem;flex:0 0 auto;max-width:16.5rem;}' +
+      '.nest-listen-voices{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:0.28rem;}' +
+      '.nest-listen-voice{appearance:none;-webkit-appearance:none;border:1px solid var(--border,#c9d5de);background:transparent;color:var(--text-muted,#4a5d6c);font-family:var(--ui,Inter,system-ui,sans-serif);font-size:0.68rem;font-weight:600;letter-spacing:0.01em;padding:0.16rem 0.48rem;border-radius:999px;cursor:pointer;line-height:1.3;}' +
+      '.nest-listen-voice:hover{border-color:#3b1848;color:#3b1848;}' +
+      '.nest-listen-voice[aria-checked="true"]{border-color:#3b1848;background:#fffaf3;color:#3b1848;}' +
+      '.nest-listen-voice:focus-visible{outline:2px solid var(--accent,#c4a056);outline-offset:2px;}' +
       '.nest-listen-meta{display:flex;flex-direction:column;align-items:flex-end;gap:0.22rem;margin-top:0.35rem;text-align:right;}' +
       '.nest-listen-honesty,.nest-listen-caption{margin:0;max-width:18rem;font-size:0.68rem;line-height:1.35;color:var(--text-muted,#4a5d6c);}' +
       '.nest-listen-prelude{appearance:none;-webkit-appearance:none;background:transparent;border:0;padding:0;margin:0;font-family:inherit;font-size:0.72rem;font-weight:600;line-height:1.35;color:#3b1848;text-decoration:underline;text-underline-offset:2px;cursor:pointer;text-align:right;max-width:18rem;}' +
       '.nest-listen-prelude[aria-pressed="true"]{color:var(--accent-dark,#9a7c3a);}' +
       '.nest-listen-prelude:focus-visible{outline:2px solid var(--accent,#c4a056);outline-offset:2px;}' +
-      '@media (max-width:720px){.nest-chrome-titleline{flex-direction:column;align-items:flex-start;gap:0.45rem;}.nest-listen-btn:disabled,.nest-listen-btn.is-busy{text-align:left;}.nest-listen-meta,.nest-listen-prelude{align-items:flex-start;text-align:left;}}' +
+      '@media (max-width:720px){.nest-chrome-titleline{flex-direction:column;align-items:flex-start;gap:0.45rem;}.nest-listen-tools,.nest-listen-voices{align-items:flex-start;justify-content:flex-start;}.nest-listen-btn:disabled,.nest-listen-btn.is-busy{text-align:left;}.nest-listen-meta,.nest-listen-prelude{align-items:flex-start;text-align:left;}}' +
       '.nest-lead{margin-top:0.75rem;padding:0.9rem 1rem;border:1px solid var(--border,#e4d6c4);border-left:3px solid var(--accent,#c4a056);border-radius:10px;background:var(--bg,#fffaf3);}' +
       '.nest-lead-kicker{font-size:0.68rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-light,#6d8288);}' +
       '.nest-lead-title{font-family:var(--display);font-size:1.12rem;font-weight:700;line-height:1.25;margin-top:0.15rem;}' +
@@ -955,14 +961,13 @@
   var NEST_LISTEN_HONESTY = 'Synthesized voice · not official Vatican audio · not a Mass substitute · preview';
   var KOKORO_MODEL = 'onnx-community/Kokoro-82M-v1.0-ONNX';
   var KOKORO_IMPORT = 'https://cdn.jsdelivr.net/npm/kokoro-js@1.2.1/dist/kokoro.web.js';
-  var KOKORO_STOCK = {
-    af_heart: 1, af_alloy: 1, af_aoede: 1, af_bella: 1, af_jessica: 1, af_kore: 1,
-    af_nicole: 1, af_nova: 1, af_river: 1, af_sarah: 1, af_sky: 1,
-    am_adam: 1, am_echo: 1, am_eric: 1, am_fenrir: 1, am_liam: 1, am_michael: 1,
-    am_onyx: 1, am_puck: 1, am_santa: 1,
-    bf_alice: 1, bf_emma: 1, bf_isabella: 1, bf_lily: 1,
-    bm_daniel: 1, bm_fable: 1, bm_george: 1, bm_lewis: 1
-  };
+  var KOKORO_PASTORAL = [
+    { id: 'af_heart', label: 'Heart' },
+    { id: 'af_bella', label: 'Bella' },
+    { id: 'bf_emma', label: 'Emma' },
+    { id: 'bm_george', label: 'George' }
+  ];
+  var NEST_VOICE_KEY = 'popechat.nestListenVoice';
 
   function nestVoicePlayable() {
     try {
@@ -990,10 +995,42 @@
     return NEST_LISTEN_HONESTY;
   }
 
+  function pastoralById(id) {
+    for (var i = 0; i < KOKORO_PASTORAL.length; i++) {
+      if (KOKORO_PASTORAL[i].id === id) return KOKORO_PASTORAL[i];
+    }
+    return null;
+  }
+
+  function savedNestVoice() {
+    try {
+      var id = localStorage.getItem(NEST_VOICE_KEY) || '';
+      if (pastoralById(id)) return id;
+    } catch (e) {}
+    return '';
+  }
+
   function kokoroVoiceId(audio) {
+    var saved = savedNestVoice();
+    if (saved) return saved;
     var want = audio && String(audio.voice || '');
-    if (KOKORO_STOCK[want]) return want;
-    return KOKORO_STOCK.af_heart ? 'af_heart' : 'af_bella';
+    if (pastoralById(want)) return want;
+    return 'af_heart';
+  }
+
+  function rememberNestVoice(id) {
+    if (!pastoralById(id)) return;
+    try { localStorage.setItem(NEST_VOICE_KEY, id); } catch (e) {}
+    for (var i = 0; i < NESTS.length; i++) {
+      if (NESTS[i] && NESTS[i].audio) NESTS[i].audio.voice = id;
+    }
+  }
+
+  function pastoralFallback(failed) {
+    for (var i = 0; i < KOKORO_PASTORAL.length; i++) {
+      if (KOKORO_PASTORAL[i].id !== failed) return KOKORO_PASTORAL[i].id;
+    }
+    return 'af_heart';
   }
 
   function kokoroSpeed(audio) {
@@ -1288,6 +1325,13 @@
       btn.setAttribute('aria-label', ctl.aria);
       btn.classList.toggle('is-busy', !!ctl.busy);
     }
+    var chosenVoice = kokoroVoiceId(nest && nest.audio);
+    var voiceBtns = document.querySelectorAll('[data-nest-listen="voice"]');
+    for (var vi = 0; vi < voiceBtns.length; vi++) {
+      var onVoice = voiceBtns[vi].getAttribute('data-voice') === chosenVoice;
+      voiceBtns[vi].setAttribute('aria-checked', onVoice ? 'true' : 'false');
+      voiceBtns[vi].setAttribute('aria-pressed', onVoice ? 'true' : 'false');
+    }
     var pre = document.getElementById('nest-listen-prelude');
     if (pre && nest) {
       var on = nestVoice.mode === 'prelude' && nestVoice.slug === nest.slug;
@@ -1427,7 +1471,13 @@
     loadKokoro().then(function (tts) {
       if (nestVoice.gen !== gen) return null;
       if (tts && tts.voices && !tts.voices[voice]) {
-        voice = (tts.voices.af_heart && 'af_heart') || (tts.voices.af_bella && 'af_bella') || voice;
+        voice = 'af_heart';
+        for (var vi = 0; vi < KOKORO_PASTORAL.length; vi++) {
+          if (tts.voices[KOKORO_PASTORAL[vi].id]) {
+            voice = KOKORO_PASTORAL[vi].id;
+            break;
+          }
+        }
       }
       nestVoice.loadLabel = 'Loading voice…';
       if (nestVoice.gen === gen) syncNestListenUi();
@@ -1449,9 +1499,10 @@
             return tts.generate(part, { voice: voice, speed: speed }).then(function (clip) {
               return take(clip, chunks);
             }, function (err) {
-              if (voice === 'af_bella' || !KOKORO_STOCK.af_bella) throw err;
-              voice = 'af_bella';
-              return tts.generate(part, { voice: 'af_bella', speed: speed }).then(function (clip) {
+              var next = pastoralFallback(voice);
+              if (!next || next === voice) throw err;
+              voice = next;
+              return tts.generate(part, { voice: next, speed: speed }).then(function (clip) {
                 return take(clip, chunks);
               });
             });
@@ -1507,6 +1558,17 @@
       return;
     }
     startNestTts(currentNest);
+  }
+
+  function selectNestVoice(id) {
+    if (!pastoralById(id) || !currentNest) return;
+    var prev = kokoroVoiceId(currentNest.audio);
+    if (prev === id) return;
+    rememberNestVoice(id);
+    syncNestListenUi();
+    if (nestVoice.mode === 'tts' && nestVoice.slug === currentNest.slug) {
+      startNestTts(currentNest);
+    }
   }
 
   function dropPreludeControl() {
@@ -1584,8 +1646,19 @@
       btn = '<button type="button" class="nest-listen-btn is-unavailable" id="nest-listen-btn" disabled aria-disabled="true">Voice unavailable in this browser</button>';
     } else {
       var ctl = listenControl(nest);
-      btn = '<button type="button" class="nest-listen-btn' + (ctl.busy ? ' is-busy' : '') + '" id="nest-listen-btn" data-nest-listen="tts" aria-pressed="' +
-        (ctl.pressed ? 'true' : 'false') + '" aria-label="' + escapeHtml(ctl.aria) + '">' + escapeHtml(ctl.text) + '</button>';
+      var chosen = kokoroVoiceId(audio);
+      var voices = '<div class="nest-listen-voices" role="radiogroup" aria-label="Synthesized voice">';
+      for (var vi = 0; vi < KOKORO_PASTORAL.length; vi++) {
+        var v = KOKORO_PASTORAL[vi];
+        var on = v.id === chosen;
+        voices += '<button type="button" class="nest-listen-voice" data-nest-listen="voice" data-voice="' + v.id +
+          '" role="radio" aria-checked="' + (on ? 'true' : 'false') + '" aria-pressed="' + (on ? 'true' : 'false') +
+          '" aria-label="' + escapeHtml(v.label) + '">' + escapeHtml(v.label) + '</button>';
+      }
+      voices += '</div>';
+      btn = '<div class="nest-listen-tools"><button type="button" class="nest-listen-btn' + (ctl.busy ? ' is-busy' : '') + '" id="nest-listen-btn" data-nest-listen="tts" aria-pressed="' +
+        (ctl.pressed ? 'true' : 'false') + '" aria-label="' + escapeHtml(ctl.aria) + '">' + escapeHtml(ctl.text) + '</button>' +
+        voices + '</div>';
     }
     var extra = '';
     var opt = audio.optionalInstrumental;
@@ -1612,6 +1685,7 @@
       if (!t || t.disabled) return;
       var kind = t.getAttribute('data-nest-listen');
       if (kind === 'tts') toggleNestTts();
+      else if (kind === 'voice') selectNestVoice(t.getAttribute('data-voice'));
       else if (kind === 'prelude') toggleNestPrelude();
     });
   }
