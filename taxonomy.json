@@ -1,0 +1,112 @@
+{
+  "siteId": "popechat",
+  "domain": "popechat.com",
+  "taxonomyName": "Office & prayer",
+  "topics": [
+    {
+      "id": "mass-reflection",
+      "label": "Sunday Mass reflection",
+      "kind": "spirit",
+      "blurb": "After parish Mass",
+      "followDefault": true,
+      "adminSeed": true,
+      "status": "active",
+      "nestSlug": "mass-reflection"
+    },
+    {
+      "id": "vespers",
+      "label": "Evening Prayer",
+      "kind": "spirit",
+      "blurb": "Vespers room",
+      "followDefault": true,
+      "adminSeed": true,
+      "status": "active",
+      "nestSlug": "vespers"
+    },
+    {
+      "id": "intentions",
+      "label": "Prayer intentions",
+      "kind": "spirit",
+      "blurb": "Ask for prayer",
+      "followDefault": true,
+      "adminSeed": true,
+      "status": "active",
+      "nestSlug": "intentions"
+    },
+    {
+      "id": "meditation",
+      "label": "Quiet meditation",
+      "kind": "spirit",
+      "blurb": "Stillness",
+      "followDefault": true,
+      "adminSeed": true,
+      "status": "active",
+      "nestSlug": "meditation"
+    },
+    {
+      "id": "hymns",
+      "label": "Hymns & song",
+      "kind": "spirit",
+      "blurb": "Sacred music talk",
+      "followDefault": true,
+      "adminSeed": true,
+      "status": "active",
+      "nestSlug": "hymns"
+    },
+    {
+      "id": "vatican-news",
+      "label": "Vatican News",
+      "kind": "org",
+      "blurb": "Official outbound only",
+      "followDefault": true,
+      "adminSeed": true,
+      "status": "active"
+    },
+    {
+      "id": "homilies",
+      "label": "Homilies",
+      "kind": "spirit-doc",
+      "blurb": "Cited texts",
+      "followDefault": false,
+      "adminSeed": true,
+      "status": "active"
+    },
+    {
+      "id": "encyclicals",
+      "label": "Encyclicals",
+      "kind": "spirit-doc",
+      "blurb": "Documents FACT",
+      "followDefault": false,
+      "adminSeed": true,
+      "status": "active"
+    },
+    {
+      "id": "liturgy",
+      "label": "Liturgical year",
+      "kind": "theme",
+      "blurb": "Seasons & feasts",
+      "followDefault": false,
+      "adminSeed": true,
+      "status": "active"
+    },
+    {
+      "id": "pilgrimage",
+      "label": "Pilgrims",
+      "kind": "theme",
+      "blurb": "Square & travel",
+      "followDefault": false,
+      "adminSeed": true,
+      "status": "active"
+    }
+  ],
+  "topicCount": 10,
+  "defaultWatchlist": [
+    "mass-reflection",
+    "vespers",
+    "intentions",
+    "meditation",
+    "hymns",
+    "vatican-news"
+  ],
+  "notes": "adminSeed topics are factory pre-populated. Users may unfollow (remove from their list) or follow more from the full taxonomy. Admins may retire topics (status=retired) or add new ones; user lists stay editable."
+}
