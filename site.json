@@ -775,7 +775,7 @@
     "kicker": "Urbi et orbi",
     "meta": "From the source",
     "footer": "Vatican News as a link. Not a lectionary paste. Ads off. Not official Vatican. Not a meme. Watch Mass live via official outbound only. Not hosted here. Not a substitute for parish Mass when you can go. Virtual tours open on the Museums site. We do not host them. Not a Mass. Not a substitute for an in-person visit.",
-    "maxCards": 11,
+    "maxCards": 12,
     "outbound": [
       {
         "tag": "Vatican",
@@ -825,6 +825,20 @@
         "url": "https://mass-online.org/",
         "snippet": "Directory of Mass livestreams. Link-out only. Not official Vatican. Not hosted here. Not a parish substitute.",
         "meta": "Directory · link-out"
+      },
+      {
+        "tag": "Mass",
+        "headline": "National Shrine Mass",
+        "snippet": "Official National Shrine livestream · Sundays ~12 p.m. ET & Spanish ~2:30 p.m. ET.",
+        "url": "https://www.nationalshrine.org/mass/",
+        "meta": "Official · link-out"
+      },
+      {
+        "tag": "Mass",
+        "headline": "St. Patrick’s Cathedral Live",
+        "snippet": "Official NYC cathedral livestream · weekday, Saturday, and Sunday windows.",
+        "url": "https://saintpatrickscathedral.org/live",
+        "meta": "Official · link-out"
       },
       {
         "tag": "Museums",
