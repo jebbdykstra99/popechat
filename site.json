@@ -1,5 +1,6 @@
 {
   "siteId": "popechat",
+  "dms": true,
   "redditSr": "popechat",
   "name": "popechat",
   "tagline": "Urbi et orbi.",
