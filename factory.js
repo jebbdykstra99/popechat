@@ -13,6 +13,11 @@
   let PLACES = [];
   let TOPICS = [];
   let NESTS = [];
+  let adminNests = [];
+  let userNests = [];
+  let pendingUserNests = {};
+  var memberNestsUnsub = null;
+  var nestAddSlugDirty = false;
   let currentNest = null;
   var paintedNestSlug = null;
   var nestVoice = {
@@ -588,6 +593,7 @@
     syncChatChrome();
     syncProfile();
     listenBlocks(user.uid);
+    listenMemberNests(user.uid);
     listenConversations();
     restoreCompose(draft);
     if (shouldLand) landInFeedCompose();
@@ -1768,31 +1774,276 @@
     refreshNestSurfaces();
   }
 
-  function renderNestNav() {
-    var nav = document.querySelector('.sidebar nav');
-    if (!nav) return;
-    var list = document.getElementById('nav-nests');
-    var shown = visibleNests();
-    if (!shown.length) {
-      if (list) list.innerHTML = '';
+  function slugifyNestLabel(label) {
+    return nestSlugNorm(label)
+      .replace(/['’]/g, '')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+      .slice(0, 40);
+  }
+
+  function nestSlugError(slug) {
+    var key = nestSlugNorm(slug);
+    if (!key) return 'Add a slug.';
+    if (key.indexOf('/') !== -1) return 'One level only.';
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(key)) return 'Use lowercase letters, numbers, and hyphens.';
+    if (key.length < 2 || key.length > 40) return 'Slug must be 2–40 characters.';
+    if (NEST_RESERVED[key]) return 'That slug is reserved.';
+    if (findNest(key)) return 'That room already exists.';
+    return '';
+  }
+
+  function mergeNests() {
+    var built = [];
+    var seen = {};
+    function push(n) {
+      if (!n || !n.slug) return;
+      var key = nestSlugNorm(n.slug);
+      if (!key || seen[key]) return;
+      seen[key] = true;
+      built.push(n);
+    }
+    adminNests.forEach(push);
+    userNests.forEach(push);
+    Object.keys(pendingUserNests).forEach(function (k) { push(pendingUserNests[k]); });
+    NESTS = built;
+    if (currentNest) currentNest = findNest(currentNest.slug) || null;
+    if (currentNest || paintedNestSlug) applyNestChrome();
+    else renderNestNav();
+  }
+
+  function absorbUserNests(list) {
+    userNests = list || [];
+    var have = {};
+    userNests.forEach(function (n) { have[nestSlugNorm(n.slug)] = true; });
+    Object.keys(pendingUserNests).forEach(function (k) {
+      if (have[k]) delete pendingUserNests[k];
+    });
+    mergeNests();
+  }
+
+  function listenMemberNests(uid) {
+    if (memberNestsUnsub) {
+      memberNestsUnsub();
+      memberNestsUnsub = null;
+    }
+    userNests = [];
+    pendingUserNests = {};
+    hideNestAddForm();
+    if (!uid || !fbDb || !SITE_ID) {
+      mergeNests();
       return;
     }
-    if (!list) {
-      list = document.createElement('ul');
-      list.id = 'nav-nests';
-      list.className = 'nav-nests';
-      var mainUl = nav.querySelector('ul');
-      if (mainUl && mainUl.parentNode) mainUl.after(list);
-      else nav.insertBefore(list, nav.firstChild);
+    memberNestsUnsub = fbDb.collection('sites').doc(SITE_ID)
+      .collection('memberNests').doc(uid)
+      .collection('rooms')
+      .onSnapshot(function (snap) {
+        var list = [];
+        snap.forEach(function (d) {
+          var data = d.data() || {};
+          var slug = nestSlugNorm(data.slug || d.id);
+          if (!slug) return;
+          list.push({
+            slug: slug,
+            label: String(data.label || slug).slice(0, 40),
+            parent: null,
+            kind: 'user',
+            blurb: typeof data.blurb === 'string' ? data.blurb : '',
+            nav: data.nav !== false,
+            user: true
+          });
+        });
+        absorbUserNests(list);
+      }, function (err) {
+        console.warn('member nests', err);
+        absorbUserNests([]);
+      });
+  }
+
+  function createMemberNest(label, slug) {
+    var uid = liveUid();
+    if (!uid || !fbDb) return Promise.reject(new Error('Sign in to add a room.'));
+    var nest = {
+      slug: slug,
+      label: label,
+      parent: null,
+      kind: 'user',
+      blurb: '',
+      nav: true,
+      user: true
+    };
+    pendingUserNests[slug] = nest;
+    mergeNests();
+    return fbDb.collection('sites').doc(SITE_ID)
+      .collection('memberNests').doc(uid)
+      .collection('rooms').doc(slug)
+      .set({
+        siteId: SITE_ID,
+        ownerUid: uid,
+        slug: slug,
+        label: label,
+        parent: null,
+        kind: 'user',
+        blurb: '',
+        nav: true,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      }).then(function () {
+        goNest(slug);
+      }).catch(function (e) {
+        delete pendingUserNests[slug];
+        mergeNests();
+        if (nestSlugFromPathname(location.pathname) === slug) go('home');
+        throw e;
+      });
+  }
+
+  function hideNestAddForm() {
+    var form = document.getElementById('nav-nest-form');
+    if (form) form.hidden = true;
+    nestAddSlugDirty = false;
+    var label = document.getElementById('nest-add-label');
+    var slug = document.getElementById('nest-add-slug');
+    var err = document.getElementById('nest-add-err');
+    if (label) label.value = '';
+    if (slug) slug.value = '';
+    if (err) err.textContent = '';
+    var btn = document.getElementById('nest-add-save');
+    if (btn) btn.disabled = false;
+  }
+
+  function ensureNestNav() {
+    var nav = document.querySelector('.sidebar nav');
+    var list = document.getElementById('nav-nests');
+    if (list || !nav) return list;
+    list = document.createElement('ul');
+    list.id = 'nav-nests';
+    list.className = 'nav-nests';
+    list.setAttribute('aria-label', 'Nested rooms');
+    list.innerHTML =
+      '<li class="nav-nests-label"><span>Nests</span>' +
+        '<button type="button" class="nav-nest-add" id="nav-nest-add" aria-label="Add a nested room" title="Add a nested room">+</button></li>' +
+      '<li class="nav-nest-form" id="nav-nest-form" hidden>' +
+        '<label>Label<input type="text" id="nest-add-label" maxlength="40" autocomplete="off" placeholder="Room name"></label>' +
+        '<label>Slug<input type="text" id="nest-add-slug" maxlength="40" autocapitalize="none" autocomplete="off" spellcheck="false" placeholder="room-name"></label>' +
+        '<p class="nav-nest-form-err" id="nest-add-err" role="status"></p>' +
+        '<button type="button" class="nav-nest-save" id="nest-add-save">Add room</button>' +
+      '</li>';
+    var items = document.createElement('li');
+    var inner = document.createElement('ul');
+    inner.id = 'nav-nests-items';
+    items.appendChild(inner);
+    list.appendChild(items);
+    var mainUl = nav.querySelector('ul');
+    if (mainUl && mainUl.parentNode) mainUl.after(list);
+    else nav.insertBefore(list, nav.firstChild);
+    wireNestAddForm();
+    return list;
+  }
+
+  function wireNestAddForm() {
+    var label = document.getElementById('nest-add-label');
+    var slug = document.getElementById('nest-add-slug');
+    if (!label || label.dataset.wired) return;
+    label.dataset.wired = '1';
+    label.addEventListener('input', function () {
+      if (nestAddSlugDirty || !slug) return;
+      slug.value = slugifyNestLabel(label.value);
+    });
+    if (slug) {
+      slug.addEventListener('input', function () { nestAddSlugDirty = true; });
+      slug.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); submitNestAdd(); }
+      });
     }
-    var html = '<li class="nav-nests-label">Nests</li>';
-    for (var i = 0; i < shown.length; i++) {
+  }
+
+  function submitNestAdd() {
+    var labelEl = document.getElementById('nest-add-label');
+    var slugEl = document.getElementById('nest-add-slug');
+    var errEl = document.getElementById('nest-add-err');
+    var label = labelEl ? labelEl.value.trim() : '';
+    var slug = slugifyNestLabel(slugEl ? slugEl.value : '');
+    function show(msg) { if (errEl) errEl.textContent = msg || ''; }
+    if (!isLiveUser()) { openAuth('join'); return; }
+    if (!label || label.length > 40) { show('Add a label (40 characters max).'); return; }
+    var slugErr = nestSlugError(slug);
+    if (slugErr) { show(slugErr); return; }
+    if (!requireVerified('add a room')) {
+      if (siteKilled) show('This room is paused.');
+      else show('Verify your email before you add a room.');
+      return;
+    }
+    if (!fbDb) { show('Rooms are not connected.'); return; }
+    var btn = document.getElementById('nest-add-save');
+    if (btn) btn.disabled = true;
+    show('');
+    createMemberNest(label, slug).then(function () {
+      hideNestAddForm();
+    }).catch(function (e) {
+      if (btn) btn.disabled = false;
+      show((e && e.message) ? e.message : 'Could not add that room.');
+    });
+  }
+
+  // Optional site.nestGroups: [{ label, parents: [...] }] prints sub-headers in the Nests nav.
+  // A nest whose parent is another nest's slug is a sub-nest (subsubX): listed right under that parent, indented.
+  function nestGroupLabel(n) {
+    if (!n) return null;
+    if (n.user) return 'Your rooms';
+    var groups = (site && Array.isArray(site.nestGroups)) ? site.nestGroups : [];
+    for (var g = 0; g < groups.length; g++) {
+      var ps = groups[g] && Array.isArray(groups[g].parents) ? groups[g].parents : [];
+      if (n.parent && ps.indexOf(n.parent) !== -1) return groups[g].label || null;
+    }
+    return null;
+  }
+
+  function orderedNavNests(shown) {
+    var bySlug = {};
+    var i;
+    for (i = 0; i < shown.length; i++) bySlug[nestSlugNorm(shown[i].slug)] = shown[i];
+    var kids = {};
+    var top = [];
+    for (i = 0; i < shown.length; i++) {
       var n = shown[i];
+      var p = n.parent ? nestSlugNorm(n.parent) : '';
+      if (p && bySlug[p] && p !== nestSlugNorm(n.slug)) {
+        (kids[p] = kids[p] || []).push(n);
+      } else {
+        top.push(n);
+      }
+    }
+    var out = [];
+    for (i = 0; i < top.length; i++) {
+      out.push({ nest: top[i], depth: 0 });
+      var ch = kids[nestSlugNorm(top[i].slug)] || [];
+      for (var c = 0; c < ch.length; c++) out.push({ nest: ch[c], depth: 1 });
+    }
+    return out;
+  }
+
+  function renderNestNav() {
+    ensureNestNav();
+    var items = document.getElementById('nav-nests-items');
+    if (!items) return;
+    var rows = orderedNavNests(visibleNests());
+    var html = '';
+    var lastGroup = null;
+    for (var i = 0; i < rows.length; i++) {
+      var n = rows[i].nest;
+      if (rows[i].depth === 0) {
+        var group = nestGroupLabel(n);
+        if (group && group !== lastGroup) {
+          html += '<li class="nav-nest-group" role="presentation">' + escapeHtml(group) + '</li>';
+        }
+        lastGroup = group;
+      }
       var active = currentNest && currentNest.slug === n.slug ? ' active' : '';
-      html += '<li><a class="nav-social-link' + active + '" href="' + escapeHtml(nestPath(n.slug)) + '" data-nest="' + escapeHtml(n.slug) + '">' +
+      var child = rows[i].depth ? ' nav-nest-child' : '';
+      html += '<li><a class="nav-social-link' + active + child + '" href="' + escapeHtml(nestPath(n.slug)) + '" data-nest="' + escapeHtml(n.slug) + '">' +
         escapeHtml(n.label || n.slug) + '</a></li>';
     }
-    list.innerHTML = html;
+    items.innerHTML = html;
   }
 
   function refreshNestSurfaces() {
@@ -4008,6 +4259,7 @@
     restoreCompose(draft);
   }
   function signOut() {
+    listenMemberNests(null);
     if (fbAuth && fbAuth.currentUser) fbAuth.signOut();
     currentUser = null;
     saveJSON(LS_USER, null);
@@ -4439,13 +4691,35 @@
 
   function wireEvents() {
     document.addEventListener('click', function (e) {
+      if (e.target.closest('#nav-nest-add')) {
+        e.preventDefault();
+        if (!isLiveUser()) { openAuth('join'); return; }
+        var form = document.getElementById('nav-nest-form');
+        if (!form) return;
+        if (!form.hidden) { hideNestAddForm(); return; }
+        form.hidden = false;
+        nestAddSlugDirty = false;
+        var nestLabel = document.getElementById('nest-add-label');
+        var nestSlugInput = document.getElementById('nest-add-slug');
+        var nestErr = document.getElementById('nest-add-err');
+        if (nestLabel) nestLabel.value = '';
+        if (nestSlugInput) nestSlugInput.value = '';
+        if (nestErr) nestErr.textContent = '';
+        if (nestLabel) nestLabel.focus();
+        return;
+      }
+      if (e.target.closest('#nest-add-save')) {
+        e.preventDefault();
+        submitNestAdd();
+        return;
+      }
       const social = e.target.closest('[data-social]');
       if (social) {
         e.preventDefault();
         go(social.dataset.social);
         return;
       }
-      const nestLink = e.target.closest('[data-nest]');
+      const nestLink = e.target.closest('a[data-nest]');
       if (nestLink) {
         if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button) return;
         e.preventDefault();
@@ -5642,7 +5916,8 @@
     TRENDS = site.trends || [];
     PLACES = site.places || [];
     TOPICS = site.topics || [];
-    NESTS = Array.isArray(site.nests) ? site.nests.filter(function (n) { return n && n.slug; }) : [];
+    adminNests = Array.isArray(site.nests) ? site.nests.filter(function (n) { return n && n.slug; }) : [];
+    NESTS = adminNests.slice();
     applyTheme(site.theme);
     applySiteChrome();
     ensureJoinAuthLayout();
@@ -5666,6 +5941,7 @@
       fbAuth.onAuthStateChanged(function (user) {
         if (user) applyFbUser(user);
         else {
+          listenMemberNests(null);
           listenBlocks(null);
           if (currentUser && currentUser.live) {
             currentUser = null;
