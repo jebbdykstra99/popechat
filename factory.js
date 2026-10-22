@@ -364,6 +364,15 @@
       if (dmsOn()) syncChatChrome();
     }, function () {});
   }
+  // TAKE IT DOWN Act (47 U.S.C. 223a) NCII choice on the Report button (2026-10-22).
+  // OK files reason 'ncii'; Cancel files reason 'abuse', the old default, so every existing report still works.
+  function pickReportReason() {
+    var msg = 'Is this an intimate image or video of you (or someone you act for) shared without consent?\n\n'
+      + 'OK = Yes, report it as an intimate image (NCII)\n'
+      + 'Cancel = No, report it as abuse\n\n'
+      + 'For an intimate-image removal request, also see report.html.';
+    try { return window.confirm(msg) ? 'ncii' : 'abuse'; } catch (e) { return 'abuse'; }
+  }
   function reportPost(id) {
     if (!requireVerified('report')) return;
     var post = findPost(id);
@@ -373,7 +382,7 @@
       postId: id,
       targetUid: post.authorUid || '',
       reporterUid: liveUid(),
-      reason: 'abuse',
+      reason: pickReportReason(),
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     }).then(function () {
       composeErr('Reported. Thanks.');
@@ -6041,7 +6050,7 @@
       postId: 'story:' + id,
       targetUid: story.authorUid || '',
       reporterUid: liveUid(),
-      reason: 'abuse',
+      reason: pickReportReason(),
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     }).then(function () {
       composeErr('Reported. Thanks.');
