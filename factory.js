@@ -364,9 +364,9 @@
       if (dmsOn()) syncChatChrome();
     }, function () {});
   }
-  // TAKE IT DOWN Act (47 U.S.C. 223a) NCII choice on the Report button (2026-10-22).
-  // Three-way chooser in the room's own modal styles: intimate image -> reason 'ncii';
-  // other abuse -> reason 'abuse' (the old default); Cancel, Escape or a backdrop click files nothing.
+  // Report reason chooser (TAKE IT DOWN Act NCII 2026-10-22; remove-first reason codes 2026-10-22).
+  // Reason codes: 'ncii', 'copyright', 'violent_offensive', 'hate', 'other'.
+  // Cancel, Escape or a backdrop click files nothing. Agents flag and sort only; a person decides any restore.
   var reportPickerOpen = false;
   function pickReportReason(done) {
     if (reportPickerOpen) return;
@@ -403,7 +403,10 @@
       return b;
     }
     var first = btn('An intimate image of me (or someone I act for) shared without consent', 'conv-modal-submit', 'ncii');
-    btn('Other abuse or rule-breaking', 'conv-modal-submit', 'abuse');
+    btn('Copyright: my work posted without permission', 'conv-modal-submit', 'copyright');
+    btn('Violent or offensive image', 'conv-modal-submit', 'violent_offensive');
+    btn('Hateful or racist image', 'conv-modal-submit', 'hate');
+    btn('Other abuse or rule-breaking', 'conv-modal-submit', 'other');
     btn('Cancel', 'conv-guest-btn', null);
     var more = document.createElement('p');
     more.className = 'conv-modal-note';
@@ -411,7 +414,7 @@
     a.href = 'report.html';
     a.target = '_blank';
     a.rel = 'noopener';
-    a.textContent = 'How to send an intimate-image removal request';
+    a.textContent = 'How reports work, and how to send a removal request';
     more.appendChild(a);
     box.appendChild(more);
     ov.addEventListener('click', function (e) { if (e.target === ov) close(null); });
