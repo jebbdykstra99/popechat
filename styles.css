@@ -1459,3 +1459,11 @@ body.legal-page {
   text-decoration: none;
 }
 .nest-chrome-home:hover { text-decoration: underline; }
+
+/* Steward attribution pill (ported from new template; gpchat styles.css) */
+.post-steward-pill {
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--text-muted);
+  border: 1px solid currentColor; border-radius: 999px;
+  padding: 0.05rem 0.45rem; line-height: 1.5;
+}
