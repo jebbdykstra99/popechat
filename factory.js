@@ -365,24 +365,72 @@
     }, function () {});
   }
   // TAKE IT DOWN Act (47 U.S.C. 223a) NCII choice on the Report button (2026-10-22).
-  // OK files reason 'ncii'; Cancel files reason 'abuse', the old default, so every existing report still works.
-  function pickReportReason() {
-    var msg = 'Is this an intimate image or video of you (or someone you act for) shared without consent?\n\n'
-      + 'OK = Yes, report it as an intimate image (NCII)\n'
-      + 'Cancel = No, report it as abuse\n\n'
-      + 'For an intimate-image removal request, also see report.html.';
-    try { return window.confirm(msg) ? 'ncii' : 'abuse'; } catch (e) { return 'abuse'; }
+  // Three-way chooser in the room's own modal styles: intimate image -> reason 'ncii';
+  // other abuse -> reason 'abuse' (the old default); Cancel, Escape or a backdrop click files nothing.
+  var reportPickerOpen = false;
+  function pickReportReason(done) {
+    if (reportPickerOpen) return;
+    reportPickerOpen = true;
+    var ov = document.createElement('div');
+    ov.className = 'conv-modal-overlay open';
+    ov.setAttribute('role', 'dialog');
+    ov.setAttribute('aria-modal', 'true');
+    ov.setAttribute('aria-label', 'Report');
+    var box = document.createElement('div');
+    box.className = 'conv-modal';
+    var h = document.createElement('h2');
+    h.textContent = 'Report';
+    var note = document.createElement('p');
+    note.className = 'conv-modal-note';
+    note.textContent = 'Why are you reporting this?';
+    box.appendChild(h);
+    box.appendChild(note);
+    function onKey(e) { if (e.key === 'Escape') { e.preventDefault(); close(null); } }
+    function close(reason) {
+      if (!reportPickerOpen) return;
+      reportPickerOpen = false;
+      document.removeEventListener('keydown', onKey, true);
+      if (ov.parentNode) ov.parentNode.removeChild(ov);
+      if (reason) done(reason);
+    }
+    function btn(label, cls, reason) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = cls;
+      b.textContent = label;
+      b.addEventListener('click', function () { close(reason); });
+      box.appendChild(b);
+      return b;
+    }
+    var first = btn('An intimate image of me (or someone I act for) shared without consent', 'conv-modal-submit', 'ncii');
+    btn('Other abuse or rule-breaking', 'conv-modal-submit', 'abuse');
+    btn('Cancel', 'conv-guest-btn', null);
+    var more = document.createElement('p');
+    more.className = 'conv-modal-note';
+    var a = document.createElement('a');
+    a.href = 'report.html';
+    a.target = '_blank';
+    a.rel = 'noopener';
+    a.textContent = 'How to send an intimate-image removal request';
+    more.appendChild(a);
+    box.appendChild(more);
+    ov.addEventListener('click', function (e) { if (e.target === ov) close(null); });
+    document.addEventListener('keydown', onKey, true);
+    ov.appendChild(box);
+    document.body.appendChild(ov);
+    try { first.focus(); } catch (e) {}
   }
-  function reportPost(id) {
+  function reportPost(id, reason) {
     if (!requireVerified('report')) return;
     var post = findPost(id);
     if (!post || !fbDb) return;
+    if (!reason) { pickReportReason(function (r) { reportPost(id, r); }); return; }
     fbDb.collection('reports').add({
       siteId: SITE_ID,
       postId: id,
       targetUid: post.authorUid || '',
       reporterUid: liveUid(),
-      reason: pickReportReason(),
+      reason: reason,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     }).then(function () {
       composeErr('Reported. Thanks.');
@@ -6040,17 +6088,18 @@
       }
     }
   }
-  function reportStory(id) {
+  function reportStory(id, reason) {
     if (!requireVerified('report')) return;
     var story = findStory(id);
     if (!story || !fbDb) return;
+    if (!reason) { pickReportReason(function (r) { reportStory(id, r); }); return; }
     fbDb.collection('reports').add({
       siteId: SITE_ID,
       storyId: id,
       postId: 'story:' + id,
       targetUid: story.authorUid || '',
       reporterUid: liveUid(),
-      reason: pickReportReason(),
+      reason: reason,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     }).then(function () {
       composeErr('Reported. Thanks.');
