@@ -2721,7 +2721,7 @@
 
   function nwsHeaders(accept) {
     var cfg = railCfg();
-    var ua = cfg.userAgent || ((site && site.name) || SITE_ID || 'subx') + '/rail (jebb@subx.it)';
+    var ua = cfg.userAgent || ((site && site.name) || SITE_ID || 'subx') + '/rail (takedown@subx.it)';
     return {
       'Accept': accept || 'application/geo+json',
       'User-Agent': ua
@@ -4255,7 +4255,7 @@
       return;
     }
     if (liveUid() !== ADMIN_UID) {
-      chatErr('Welcome sends need the factory admin Google (jebb.dykstra@gmail.com). This signed-in account is not that admin.');
+      chatErr('Welcome sends require the factory admin account. This signed-in account is not that admin.');
       return;
     }
     if (!requireVerified('chat')) return;
