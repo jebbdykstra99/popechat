@@ -5,6 +5,11 @@
   const LS_USER = '415chat.user';
   const LS_LIKES = '415chat.likes';
   const SITE_JSON_URL = (document.currentScript && document.currentScript.getAttribute('data-site')) || 'site.json';
+  // Image uploads paused (2026-10-22, remove-first) until reportAlert is ported to this room.
+  // Client-side only: hides the photo / GIF / story photo-and-clip controls and refuses uploads.
+  // A matching Storage-rules change is still needed server-side (not published here).
+  const IMAGE_UPLOADS_PAUSED = true;
+  const IMAGE_UPLOADS_PAUSED_MSG = 'Image uploads are paused.';
 
   let SITE_ID = '415chat';
   let site = null;
@@ -4609,6 +4614,7 @@
     return /\.(jpe?g|png|gif|webp|heic|heif|bmp)$/i.test(file.name || '');
   }
   function showAttachedImage(file) {
+    if (IMAGE_UPLOADS_PAUSED) { attachedFile = null; composeErr(IMAGE_UPLOADS_PAUSED_MSG); return; }
     attachedFile = file;
     var img = document.getElementById('compose-preview-img');
     var box = document.getElementById('compose-image-preview');
@@ -4699,6 +4705,7 @@
   }
 
   function uploadImage(file, uid) {
+    if (IMAGE_UPLOADS_PAUSED) return Promise.reject(new Error(IMAGE_UPLOADS_PAUSED_MSG));
     if (!fbStorage) return Promise.reject(new Error('Storage not ready'));
     const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
     const path = 'posts/' + SITE_ID + '/' + uid + '/' + Date.now() + '.' + ext;
@@ -4883,6 +4890,19 @@
     var gifBtn = document.getElementById('compose-btn-gif');
     var imgIn = document.getElementById('compose-image-input');
     var gifIn = document.getElementById('compose-gif-input');
+    if (IMAGE_UPLOADS_PAUSED) {
+      [imgBtn, gifBtn, imgIn, gifIn].forEach(function (el) { if (el) { el.hidden = true; el.disabled = true; } });
+      var wrap = document.getElementById('thoughts-compose-wrap');
+      if (wrap && !document.getElementById('compose-uploads-paused')) {
+        var pn = document.createElement('p');
+        pn.id = 'compose-uploads-paused';
+        pn.className = 'compose-uploads-paused';
+        pn.setAttribute('role', 'status');
+        pn.style.cssText = 'margin:0.35rem 0 0;font-size:0.8rem;opacity:0.75;';
+        pn.textContent = IMAGE_UPLOADS_PAUSED_MSG;
+        wrap.appendChild(pn);
+      }
+    }
     if (imgBtn && imgIn) imgBtn.addEventListener('click', function () { imgIn.click(); });
     if (gifBtn && gifIn) gifBtn.addEventListener('click', function () { gifIn.click(); });
     if (imgIn) imgIn.addEventListener('change', function (e) { if (e.target.files[0]) setImagePreview(e.target.files[0]); });
@@ -5703,6 +5723,7 @@
     });
   }
   function onStoryFileChosen(file) {
+    if (IMAGE_UPLOADS_PAUSED) { storyFile = null; storiesErr(IMAGE_UPLOADS_PAUSED_MSG); return; }
     if (!file) return;
     storiesErr('');
     if (file.size > storiesMaxBytes()) {
@@ -5762,6 +5783,11 @@
         '</div>' +
       '</div>';
     document.body.appendChild(ov);
+    if (IMAGE_UPLOADS_PAUSED) {
+      ov.querySelectorAll('[data-story-type="image"], [data-story-type="video"], .stories-composer-file').forEach(function (el) { el.hidden = true; el.disabled = true; });
+      var sn = ov.querySelector('.stories-composer-note');
+      if (sn) sn.textContent = 'Lives 24 hours on this room only. Text only for now. ' + IMAGE_UPLOADS_PAUSED_MSG;
+    }
     ov.addEventListener('click', function (e) {
       if (e.target === ov) closeStoriesComposer();
     });
@@ -5821,6 +5847,7 @@
     return true;
   }
   function uploadStoryMedia(file, uid, storyId) {
+    if (IMAGE_UPLOADS_PAUSED) return Promise.reject(new Error(IMAGE_UPLOADS_PAUSED_MSG));
     if (!fbStorage) return Promise.reject(new Error('Storage not ready'));
     var ext = (file.name.split('.').pop() || (storyType === 'video' ? 'mp4' : 'jpg')).toLowerCase().replace(/[^a-z0-9]/g, '') || 'bin';
     var path = 'stories/' + SITE_ID + '/' + uid + '/' + storyId + '.' + ext;
