@@ -17,6 +17,12 @@
     }
   } catch (eLs) {}
   const SITE_JSON_URL = (document.currentScript && document.currentScript.getAttribute('data-site')) || 'site.json';
+  // Image uploads paused (2026-10-22, remove-first) when uploadsOn() is false.
+  // Client-side only: hides the photo / GIF / story photo-and-clip controls and refuses uploads.
+  // A matching Storage-rules change is still needed server-side (not published here).
+  const IMAGE_UPLOADS_PAUSED = true;
+  const IMAGE_UPLOADS_PAUSED_MSG = 'Image uploads are paused.';
+  function uploadsOn() { return !IMAGE_UPLOADS_PAUSED && !(site && site.uploads === false); }
 
   let SITE_ID = '';
   let site = null;
@@ -1091,6 +1097,11 @@
    ov.innerHTML =
      '<div class="share-sheet" role="dialog" aria-modal="true" aria-label="Share"><img class="share-sheet-preview" id="share-sheet-preview" alt="" hidden><h3>Share</h3><button type="button" data-share="copy">Copy link</button><button type="button" data-share="x">Share to x.com</button><button type="button" data-share="reddit">Share to Reddit</button><button type="button" class="share-cancel" data-share="close">Cancel</button></div>';
    document.body.appendChild(ov);
+   if (!uploadsOn()) {
+     ov.querySelectorAll('[data-story-type="image"], [data-story-type="video"], .stories-composer-file').forEach(function (el) { el.hidden = true; el.disabled = true; });
+     var sn = ov.querySelector('.stories-composer-note');
+     if (sn) sn.textContent = 'Lives 24 hours on this room only. Text only for now. ' + IMAGE_UPLOADS_PAUSED_MSG;
+   }
    ov.addEventListener('click', function (e) {
      if (e.target === ov) { closeShareSheet(); return; }
      var btn = e.target.closest('[data-share]');
@@ -4766,6 +4777,7 @@
     return /\.(jpe?g|png|gif|webp|heic|heif|bmp)$/i.test(file.name || '');
   }
   function showAttachedImage(file) {
+    if (!uploadsOn()) { attachedFile = null; composeErr(IMAGE_UPLOADS_PAUSED_MSG); return; }
     attachedFile = file;
     var img = document.getElementById('compose-preview-img');
     var box = document.getElementById('compose-image-preview');
@@ -4856,6 +4868,7 @@
   }
 
   function uploadImage(file, uid) {
+    if (!uploadsOn()) return Promise.reject(new Error(IMAGE_UPLOADS_PAUSED_MSG));
     if (!fbStorage) return Promise.reject(new Error('Storage not ready'));
     const ext = (file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
     const path = 'posts/' + SITE_ID + '/' + uid + '/' + Date.now() + '.' + ext;
@@ -5046,6 +5059,19 @@
    var gifBtn = document.getElementById('compose-btn-gif');
    var imgIn = document.getElementById('compose-image-input');
    var gifIn = document.getElementById('compose-gif-input');
+   if (!uploadsOn()) {
+     [imgBtn, gifBtn, imgIn, gifIn].forEach(function (el) { if (el) { el.hidden = true; el.disabled = true; } });
+     var wrap = document.getElementById('thoughts-compose-wrap');
+     if (wrap && !document.getElementById('compose-uploads-paused')) {
+       var pn = document.createElement('p');
+       pn.id = 'compose-uploads-paused';
+       pn.className = 'compose-uploads-paused';
+       pn.setAttribute('role', 'status');
+       pn.style.cssText = 'margin:0.35rem 0 0;font-size:0.8rem;opacity:0.75;';
+       pn.textContent = IMAGE_UPLOADS_PAUSED_MSG;
+       wrap.appendChild(pn);
+     }
+   }
    if (imgBtn && imgIn) imgBtn.addEventListener('click', function () { imgIn.click(); });
    if (gifBtn && gifIn) gifBtn.addEventListener('click', function () { gifIn.click(); });
    if (imgIn) imgIn.addEventListener('change', function (e) { if (e.target.files[0]) setImagePreview(e.target.files[0]); });
@@ -5965,6 +5991,7 @@
     });
   }
   function onStoryFileChosen(file) {
+    if (!uploadsOn()) { storyFile = null; storiesErr(IMAGE_UPLOADS_PAUSED_MSG); return; }
     if (!file) return;
     storiesErr('');
     if (file.size > storiesMaxBytes()) {
@@ -6065,6 +6092,7 @@
     return true;
   }
   function uploadStoryMedia(file, uid, storyId) {
+    if (!uploadsOn()) return Promise.reject(new Error(IMAGE_UPLOADS_PAUSED_MSG));
     if (!fbStorage) return Promise.reject(new Error('Storage not ready'));
     var ext = (file.name.split('.').pop() || (storyType === 'video' ? 'mp4' : 'jpg')).toLowerCase().replace(/[^a-z0-9]/g, '') || 'bin';
     var path = 'stories/' + SITE_ID + '/' + uid + '/' + storyId + '.' + ext;
