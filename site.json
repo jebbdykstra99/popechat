@@ -334,7 +334,7 @@
       "lead": {
         "kicker": "Lead",
         "title": "Hymns & song: Lead",
-        "body": "Featured this weekend: Te Deum (title only in-rail, no lyric dump).\n\nFACT (Official · link-out): Vatican News prayer page, The Te Deum, https://www.vaticannews.va/en/prayers/the-te-deum.html\n\nSTORYLINE (seat guidance): Praise that belongs after mercy received. Sing at parish or from your hymnal when you can. This nest points. It does not host a concert or paste copyrighted lyrics.\n\nShare other hymn titles that console the poor in spirit (title + one sentence why). Mercy before performance.",
+        "body": "Featured this weekend: Te Deum (title only in-rail, no lyric dump).\n\nFACT (Official · link-out): Vatican News prayer page, “The Te Deum”: https://www.vaticannews.va/en/prayers/the-te-deum.html\n\nSTORYLINE (seat guidance): Praise that belongs after mercy received. Sing at parish or from your hymnal when you can. This nest points you there; it does not host a concert or paste copyrighted lyrics.\n\nShare other hymn titles that console the poor in spirit (title + one sentence why). Mercy before performance.",
         "footer": "Not official Vatican. Not a meme. Not a substitute for your parish Mass. FACT · Official · link-out: Vatican News.",
         "outbound": {
           "label": "The Te Deum",
@@ -450,7 +450,7 @@
       "lead": {
         "kicker": "Lead",
         "title": "Quiet meditation: Lead",
-        "body": "Guided stillness (companion · 2 to 3 minutes · read slowly):\n\nSit as you are. Soften your jaw. One breath in… one breath out.\nWhisper: “Lord, you are near.”\nIf a name rises, a person who is poor, tired, or unseen, hold them without fixing them.\nIf resistance rises (“I will not”), ask for the grace to turn toward the vineyard anyway.\nEnd: “Jesus Christ is Lord.” Rest one breath in silence.\n\nNo debate. No hot takes. Silence is allowed. One line is enough.\n\nNot a substitute for your parish Mass. Not official Vatican. Not a meme.\nFACT (Official · link-out): Vatican News Word of the Day, https://www.vaticannews.va/en/word-of-the-day/2026/09/27.html",
+        "body": "Guided stillness (companion · 2 to 3 minutes · read slowly):\n\nSit as you are. Soften your jaw. One breath in… one breath out.\nWhisper: “Lord, you are near.”\nIf a name rises (a person who is poor, tired, or unseen), hold them without fixing them.\nIf resistance rises (“I will not”), ask for the grace to turn toward the vineyard anyway.\nEnd: “Jesus Christ is Lord.” Rest one breath in silence.\n\nNo debate. No hot takes. Silence is allowed. One line is enough.\n\nNot a substitute for your parish Mass. Not official Vatican. Not a meme.\nFACT (Official · link-out): Vatican News Word of the Day, https://www.vaticannews.va/en/word-of-the-day/2026/09/27.html",
         "footer": "Not official Vatican. Not a meme. Not a substitute for your parish Mass. FACT · Official · link-out: Vatican News.",
         "outbound": {
           "label": "Vatican News · Word of the Day",
@@ -462,7 +462,7 @@
         "vendor": "kokoro",
         "voice": "bm_george",
         "rate": 0.75,
-        "text": "Sit as you are. Soften your jaw. One breath in. One breath out. Lord, you are near. If a name rises, a person who is poor, tired, or unseen, hold them without fixing them. If resistance rises (I will not), ask for the grace to turn toward the vineyard anyway. Jesus Christ is Lord. Rest one breath in silence.",
+        "text": "Sit as you are. Soften your jaw. One breath in. One breath out. Lord, you are near. If a name rises (a person who is poor, tired, or unseen), hold them without fixing them. If resistance rises (I will not), ask for the grace to turn toward the vineyard anyway. Jesus Christ is Lord. Rest one breath in silence.",
         "honesty": "Synthesized voice · not official Vatican audio · not a Mass substitute · preview"
       }
     },
