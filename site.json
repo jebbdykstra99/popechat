@@ -159,7 +159,7 @@
     {
       "tag": "FACT",
       "title": "Vatican News",
-      "snippet": "Official · link-out — the office, the letters, from the source.",
+      "snippet": "Official · link-out: the office, the letters, from the source.",
       "url": "https://www.vaticannews.va/en.html"
     }
   ],
@@ -167,7 +167,7 @@
     {
       "slug": "mass-reflection",
       "displayName": "Sunday Mass reflection",
-      "purpose": "After-parish Mass companion for one honest word from the readings — not livestream Mass.",
+      "purpose": "After-parish Mass companion for one honest word from the readings, not livestream Mass.",
       "parent": null,
       "seedAsTopic": true,
       "sourceLinks": [
@@ -179,13 +179,13 @@
       "nav": true,
       "label": "Sunday Mass reflection",
       "kind": "theme",
-      "blurb": "Liturgy of the Word companion — read with your parish, then talk here. Not a livestream Mass. Not a substitute for your parish. Not official Vatican.",
+      "blurb": "Liturgy of the Word companion: read with your parish, then talk here. Not a livestream Mass. Not a substitute for your parish. Not official Vatican.",
       "rankings": [],
       "reviews": [],
       "railPins": [
         {
           "tag": "Lead",
-          "headline": "Sunday Mass reflection — Lead (XXVI Ordinary Time)",
+          "headline": "Sunday Mass reflection: Lead (XXVI Ordinary Time)",
           "snippet": "After parish Mass: one honest word. Gospel cited Matthew 21:28-32. Not a livestream Mass.",
           "meta": "Nest · Lead",
           "url": "/?nest=mass-reflection"
@@ -200,15 +200,15 @@
         {
           "tag": "FACT",
           "headline": "Pope Francis · Homily 16 Dec 2014",
-          "snippet": "Carried on the Vatican News Word of the Day page. Read it there — link-out only.",
+          "snippet": "Carried on the Vatican News Word of the Day page. Read it there: link-out only.",
           "meta": "Official · link-out",
           "url": "https://www.vaticannews.va/en/word-of-the-day/2026/09/27.html"
         }
       ],
       "lead": {
         "kicker": "Lead",
-        "title": "Sunday Mass reflection — Lead (XXVI Ordinary Time)",
-        "body": "FACT (Vatican News · Word of the Day · 27 Sep 2026): Twenty-sixth Sunday in Ordinary Time. Gospel cited: Matthew 21:28-32 (the two sons). Readings + commentary outbound only — https://www.vaticannews.va/en/word-of-the-day/2026/09/27.html\n\nFACT (Pope Francis · Homily 16 Dec 2014 · carried on that Vatican News page): If you do not listen to the Lord, accept correction, and trust in Him, the heart is closed to salvation. The “humble and lowly” who take refuge in the name of the Lord — who trust in the Lord — are the saved, and that is the way of the Church.\n\nSTORYLINE (companion, not magisterium): After your parish Mass, bring one honest word — especially if the readings touched the tired, the poor, or anyone who said “I will not” and then turned toward the vineyard anyway.\n\nThis nest is a Liturgy of the Word companion. Not a livestream Mass. Not a valid sacramental Mass online. Nobody here claims clergy authority.",
+        "title": "Sunday Mass reflection: Lead (XXVI Ordinary Time)",
+        "body": "FACT (Vatican News · Word of the Day · 27 Sep 2026): Twenty-sixth Sunday in Ordinary Time. Gospel cited: Matthew 21:28-32 (the two sons). Readings + commentary outbound only: https://www.vaticannews.va/en/word-of-the-day/2026/09/27.html\n\nFACT (Pope Francis · Homily 16 Dec 2014 · carried on that Vatican News page): If you do not listen to the Lord, accept correction, and trust in Him, the heart is closed to salvation. The “humble and lowly” who take refuge in the name of the Lord — who trust in the Lord — are the saved, and that is the way of the Church.\n\nSTORYLINE (companion, not magisterium): After your parish Mass, bring one honest word, especially if the readings touched the tired, the poor, or anyone who said “I will not” and then turned toward the vineyard anyway.\n\nThis nest is a Liturgy of the Word companion. Not a livestream Mass. Not a valid sacramental Mass online. Nobody here claims clergy authority.",
         "footer": "Not official Vatican. Not a meme. Not a substitute for your parish Mass. FACT · Official · link-out: Vatican News.",
         "outbound": {
           "label": "Vatican News · Word of the Day",
@@ -220,14 +220,14 @@
         "vendor": "kokoro",
         "voice": "bm_george",
         "rate": 0.75,
-        "text": "This is a Sunday Mass reflection companion for after your parish Mass. Today’s Gospel is the parable of the two sons — Matthew chapter twenty-one. If you said “I will not,” and then turned toward mercy anyway — you belong here. Bring one honest word. Not a livestream Mass. Not official Vatican.",
+        "text": "This is a Sunday Mass reflection companion for after your parish Mass. Today’s Gospel is the parable of the two sons, Matthew chapter twenty-one. If you said “I will not,” and then turned toward mercy anyway, you belong here. Bring one honest word. Not a livestream Mass. Not official Vatican.",
         "honesty": "Synthesized voice · not official Vatican audio · not a Mass substitute · preview"
       }
     },
     {
       "slug": "vespers",
       "displayName": "Evening Prayer",
-      "purpose": "Vespers-style companion for day's end — gratitude, mercy asked, one person named, rest.",
+      "purpose": "Vespers-style companion for day's end: gratitude, mercy asked, one person named, rest.",
       "parent": null,
       "seedAsTopic": true,
       "sourceLinks": [
@@ -239,13 +239,13 @@
       "nav": true,
       "label": "Evening Prayer",
       "kind": "theme",
-      "blurb": "Vespers-style quiet at day’s end — thanksgiving, examen, rest in God. Not official Vatican. Not a meme.",
+      "blurb": "Vespers-style quiet at day’s end: thanksgiving, examen, rest in God. Not official Vatican. Not a meme.",
       "rankings": [],
       "reviews": [],
       "railPins": [
         {
           "tag": "Lead",
-          "headline": "Evening Prayer — Lead",
+          "headline": "Evening Prayer: Lead",
           "snippet": "Vespers-style companion at day’s end. Not Mass online. Not a substitute for your parish Mass.",
           "meta": "Nest · Lead",
           "url": "/?nest=vespers"
@@ -260,8 +260,8 @@
       ],
       "lead": {
         "kicker": "Lead",
-        "title": "Evening Prayer — Lead",
-        "body": "FACT (room purpose): Vespers-style companion — Saturday eve warm-up and Sunday close (America/Denver). Day’s end for anyone tired, poor in spirit, or carrying someone else’s burden.\n\nSTORYLINE (companion): A simple shape — one gratitude · one mercy asked · one person named · rest. Not Mass online. Not a substitute for your parish Mass.\n\nFACT (Official · link-out): Vatican News — https://www.vaticannews.va/en.html\n\nBring what the day cost you. You do not have to perform holiness here. Mercy before spectacle.",
+        "title": "Evening Prayer: Lead",
+        "body": "FACT (room purpose): Vespers-style companion, Saturday eve warm-up and Sunday close (America/Denver). Day’s end for anyone tired, poor in spirit, or carrying someone else’s burden.\n\nSTORYLINE (companion): A simple shape. One gratitude · one mercy asked · one person named · rest. Not Mass online. Not a substitute for your parish Mass.\n\nFACT (Official · link-out): Vatican News, https://www.vaticannews.va/en.html\n\nBring what the day cost you. You do not have to perform holiness here. Mercy before spectacle.",
         "footer": "Not official Vatican. Not a meme. Not a substitute for your parish Mass. FACT · Official · link-out: Vatican News.",
         "outbound": {
           "label": "Vatican News",
@@ -280,7 +280,7 @@
     {
       "slug": "morning-prayer",
       "displayName": "Morning Prayer",
-      "purpose": "Lauds-style companion to open the day quietly — praise before hurry.",
+      "purpose": "Lauds-style companion to open the day quietly: praise before hurry.",
       "parent": null,
       "seedAsTopic": false,
       "sourceLinks": [
@@ -292,7 +292,7 @@
       "nav": true,
       "label": "Morning Prayer",
       "kind": "theme",
-      "blurb": "Lauds-style companion to open the day quietly — praise before hurry.",
+      "blurb": "Lauds-style companion to open the day quietly: praise before hurry.",
       "rankings": [],
       "reviews": [],
       "railPins": []
@@ -300,7 +300,7 @@
     {
       "slug": "hymns",
       "displayName": "Hymns & song",
-      "purpose": "Hymn nest pointing to praise after mercy — Te Deum title; PD / cleared tracks only.",
+      "purpose": "Hymn nest pointing to praise after mercy: Te Deum title; PD / cleared tracks only.",
       "parent": null,
       "seedAsTopic": true,
       "sourceLinks": [
@@ -312,29 +312,29 @@
       "nav": true,
       "label": "Hymns & song",
       "kind": "theme",
-      "blurb": "Sing at home or parish — titles and why they help; no lyric dumps. Not official Vatican.",
+      "blurb": "Sing at home or parish: titles and why they help; no lyric dumps. Not official Vatican.",
       "rankings": [],
       "reviews": [],
       "railPins": [
         {
           "tag": "Lead",
-          "headline": "Hymns & song — Lead",
-          "snippet": "Featured this weekend: Te Deum. Title only — no lyric dump.",
+          "headline": "Hymns & song: Lead",
+          "snippet": "Featured this weekend: Te Deum. Title only, no lyric dump.",
           "meta": "Nest · Lead",
           "url": "/?nest=hymns"
         },
         {
           "tag": "FACT",
           "headline": "The Te Deum",
-          "snippet": "Vatican News prayer page. Title only — link-out, no lyric paste.",
+          "snippet": "Vatican News prayer page. Title only: link-out, no lyric paste.",
           "meta": "Official · link-out",
           "url": "https://www.vaticannews.va/en/prayers/the-te-deum.html"
         }
       ],
       "lead": {
         "kicker": "Lead",
-        "title": "Hymns & song — Lead",
-        "body": "Featured this weekend: Te Deum (title only in-rail — no lyric dump).\n\nFACT (Official · link-out): Vatican News prayer page — The Te Deum — https://www.vaticannews.va/en/prayers/the-te-deum.html\n\nSTORYLINE (seat guidance): Praise that belongs after mercy received. Sing at parish or from your hymnal when you can. This nest points — it does not host a concert or paste copyrighted lyrics.\n\nShare other hymn titles that console the poor in spirit (title + one sentence why). Mercy before performance.",
+        "title": "Hymns & song: Lead",
+        "body": "Featured this weekend: Te Deum (title only in-rail, no lyric dump).\n\nFACT (Official · link-out): Vatican News prayer page, “The Te Deum”: https://www.vaticannews.va/en/prayers/the-te-deum.html\n\nSTORYLINE (seat guidance): Praise that belongs after mercy received. Sing at parish or from your hymnal when you can. This nest points you there; it does not host a concert or paste copyrighted lyrics.\n\nShare other hymn titles that console the poor in spirit (title + one sentence why). Mercy before performance.",
         "footer": "Not official Vatican. Not a meme. Not a substitute for your parish Mass. FACT · Official · link-out: Vatican News.",
         "outbound": {
           "label": "The Te Deum",
@@ -347,7 +347,7 @@
         "voice": "bm_george",
         "rate": 0.75,
         "lang": "en",
-        "text": "Hymns companion. Featured this weekend: Te Deum — we praise you, O God. This voice speaks English. It is not sung Latin, and it is not a perfect liturgy. Sing at your parish or from your hymnal when you can.",
+        "text": "Hymns companion. Featured this weekend: Te Deum. We praise you, O God. This voice speaks English. It is not sung Latin, and it is not a perfect liturgy. Sing at your parish or from your hymnal when you can.",
         "caption": "English companion · not sung Latin · not a perfect liturgy",
         "latin": "Te Deum laudamus: te Dominum confitemur. Te aeternum Patrem omnis terra veneratur. Tibi omnes Angeli, tibi caeli et universae potestates: tibi Cherubim et Seraphim incessabili voce proclamant: Sanctus, Sanctus, Sanctus, Dominus Deus Sabaoth.",
         "latinCaveat": "Not spoken. kokoro-js phonemizes English only (en-us or en), so the Latin Te Deum is not sent to the model.",
@@ -363,7 +363,7 @@
     {
       "slug": "intentions",
       "displayName": "Prayer intentions",
-      "purpose": "Listening porch for names of the downtrodden, poor, unseen, and afraid — one intention is enough.",
+      "purpose": "Listening porch for names of the downtrodden, poor, unseen, and afraid: one intention is enough.",
       "parent": null,
       "seedAsTopic": true,
       "sourceLinks": [
@@ -375,13 +375,13 @@
       "nav": true,
       "label": "Prayer intentions",
       "kind": "theme",
-      "blurb": "Name what you carry — people, parish, the poor, the world. Charity first. Not official Vatican.",
+      "blurb": "Name what you carry: people, parish, the poor, the world. Charity first. Not official Vatican.",
       "rankings": [],
       "reviews": [],
       "railPins": [
         {
           "tag": "Lead",
-          "headline": "Prayer intentions — Lead",
+          "headline": "Prayer intentions: Lead",
           "snippet": "An ear for names. One intention is plenty. Not a sacrament. Not a substitute for your parish Mass.",
           "meta": "Nest · Lead",
           "url": "/?nest=intentions"
@@ -396,8 +396,8 @@
       ],
       "lead": {
         "kicker": "Lead",
-        "title": "Prayer intentions — Lead",
-        "body": "Featured prayer (porch · not a sacrament):\n\nLord Jesus, you welcome the repentant and go ahead of the proud.\nReceive the names we carry — the downtrodden, the poor, the unseen, the afraid.\nHold what we cannot fix. Teach us to listen before we speak.\nAmen.\n\nThis nest is an ear. One intention per comment is plenty. We will not turn your name into content. Charity first. No dunk culture. No fixing people who only asked to be held in prayer.\n\nNot clergy. Not counseling cosplay. Not a substitute for your parish Mass — if you can, carry these names to the altar there too.\n\nFACT (Official · link-out): Vatican News — https://www.vaticannews.va/en.html",
+        "title": "Prayer intentions: Lead",
+        "body": "Featured prayer (porch · not a sacrament):\n\nLord Jesus, you welcome the repentant and go ahead of the proud.\nReceive the names we carry: the downtrodden, the poor, the unseen, the afraid.\nHold what we cannot fix. Teach us to listen before we speak.\nAmen.\n\nThis nest is an ear. One intention per comment is plenty. We will not turn your name into content. Charity first. No dunk culture. No fixing people who only asked to be held in prayer.\n\nNot clergy. Not counseling cosplay. Not a substitute for your parish Mass. If you can, carry these names to the altar there too.\n\nFACT (Official · link-out): Vatican News, https://www.vaticannews.va/en.html",
         "footer": "Not official Vatican. Not a meme. Not a substitute for your parish Mass. FACT · Official · link-out: Vatican News.",
         "outbound": {
           "label": "Vatican News",
@@ -409,14 +409,14 @@
         "vendor": "kokoro",
         "voice": "bm_george",
         "rate": 0.75,
-        "text": "Lord Jesus, you welcome the repentant and go ahead of the proud. Receive the names we carry — the downtrodden, the poor, the unseen, the afraid. Hold what we cannot fix. Teach us to listen before we speak. Amen.",
+        "text": "Lord Jesus, you welcome the repentant and go ahead of the proud. Receive the names we carry: the downtrodden, the poor, the unseen, the afraid. Hold what we cannot fix. Teach us to listen before we speak. Amen.",
         "honesty": "Synthesized voice · not official Vatican audio · not a Mass substitute · preview"
       }
     },
     {
       "slug": "meditation",
       "displayName": "Quiet meditation",
-      "purpose": "Short guided stillness — breathe, hold a name without fixing, rest.",
+      "purpose": "Short guided stillness: breathe, hold a name without fixing, rest.",
       "parent": null,
       "seedAsTopic": true,
       "sourceLinks": [
@@ -428,13 +428,13 @@
       "nav": true,
       "label": "Quiet meditation",
       "kind": "theme",
-      "blurb": "Stillness hour — short breath prayer, no argument. Not official Vatican.",
+      "blurb": "Stillness hour: short breath prayer, no argument. Not official Vatican.",
       "rankings": [],
       "reviews": [],
       "railPins": [
         {
           "tag": "Lead",
-          "headline": "Quiet meditation — Lead",
+          "headline": "Quiet meditation: Lead",
           "snippet": "Guided stillness, read slowly. Silence is allowed. Not a substitute for your parish Mass.",
           "meta": "Nest · Lead",
           "url": "/?nest=meditation"
@@ -449,8 +449,8 @@
       ],
       "lead": {
         "kicker": "Lead",
-        "title": "Quiet meditation — Lead",
-        "body": "Guided stillness (companion · 2–3 minutes · read slowly):\n\nSit as you are. Soften your jaw. One breath in… one breath out.\nWhisper: “Lord, you are near.”\nIf a name rises — a person who is poor, tired, or unseen — hold them without fixing them.\nIf resistance rises — “I will not” — ask for the grace to turn toward the vineyard anyway.\nEnd: “Jesus Christ is Lord.” Rest one breath in silence.\n\nNo debate. No hot takes. Silence is allowed. One line is enough.\n\nNot a substitute for your parish Mass. Not official Vatican. Not a meme.\nFACT (Official · link-out): Vatican News Word of the Day — https://www.vaticannews.va/en/word-of-the-day/2026/09/27.html",
+        "title": "Quiet meditation: Lead",
+        "body": "Guided stillness (companion · 2 to 3 minutes · read slowly):\n\nSit as you are. Soften your jaw. One breath in… one breath out.\nWhisper: “Lord, you are near.”\nIf a name rises (a person who is poor, tired, or unseen), hold them without fixing them.\nIf resistance rises (“I will not”), ask for the grace to turn toward the vineyard anyway.\nEnd: “Jesus Christ is Lord.” Rest one breath in silence.\n\nNo debate. No hot takes. Silence is allowed. One line is enough.\n\nNot a substitute for your parish Mass. Not official Vatican. Not a meme.\nFACT (Official · link-out): Vatican News Word of the Day, https://www.vaticannews.va/en/word-of-the-day/2026/09/27.html",
         "footer": "Not official Vatican. Not a meme. Not a substitute for your parish Mass. FACT · Official · link-out: Vatican News.",
         "outbound": {
           "label": "Vatican News · Word of the Day",
@@ -462,26 +462,26 @@
         "vendor": "kokoro",
         "voice": "bm_george",
         "rate": 0.75,
-        "text": "Sit as you are. Soften your jaw. One breath in. One breath out. Lord, you are near. If a name rises — a person who is poor, tired, or unseen — hold them without fixing them. If resistance rises — I will not — ask for the grace to turn toward the vineyard anyway. Jesus Christ is Lord. Rest one breath in silence.",
+        "text": "Sit as you are. Soften your jaw. One breath in. One breath out. Lord, you are near. If a name rises (a person who is poor, tired, or unseen), hold them without fixing them. If resistance rises (I will not), ask for the grace to turn toward the vineyard anyway. Jesus Christ is Lord. Rest one breath in silence.",
         "honesty": "Synthesized voice · not official Vatican audio · not a Mass substitute · preview"
       }
     },
     {
       "slug": "rosary",
       "displayName": "Rosary",
-      "purpose": "Rosary companion pointing to official mysteries and prayer — leads toward liturgy, never replaces it.",
+      "purpose": "Rosary companion pointing to official mysteries and prayer: leads toward liturgy, never replaces it.",
       "parent": null,
       "seedAsTopic": false,
       "sourceLinks": [
         "https://www.vaticannews.va/en/prayers/the-rosary.html",
         "https://www.vatican.va/roman_curia/congregations/ccdds/documents/rc_con_ccdds_doc_20020513_vers-direttorio_en.html"
       ],
-      "notes": "APPROVED nest (CLEAR WITH EDITS). Followable; NOT default Watchlist seed. Link-out to Vatican News prayer page; Directory §§197–202. No meme Marian spectacle. displayGroupLabel copy-only: Prayer.",
+      "notes": "APPROVED nest (CLEAR WITH EDITS). Followable; NOT default Watchlist seed. Link-out to Vatican News prayer page; Directory §§197 to 202. No meme Marian spectacle. displayGroupLabel copy-only: Prayer.",
       "displayGroupLabel": "Prayer",
       "nav": true,
       "label": "Rosary",
       "kind": "theme",
-      "blurb": "Rosary companion pointing to official mysteries and prayer — leads toward liturgy, never replaces it.",
+      "blurb": "Rosary companion pointing to official mysteries and prayer: leads toward liturgy, never replaces it.",
       "rankings": [],
       "reviews": [],
       "railPins": []
@@ -489,7 +489,7 @@
     {
       "slug": "with-the-poor",
       "displayName": "With the poor",
-      "purpose": "Mercy room to read the downtrodden into prayer and documents — hospitals and bread before argument.",
+      "purpose": "Mercy room to read the downtrodden into prayer and documents: hospitals and bread before argument.",
       "parent": null,
       "seedAsTopic": true,
       "sourceLinks": [
@@ -502,7 +502,7 @@
       "nav": true,
       "label": "With the poor",
       "kind": "theme",
-      "blurb": "Mercy room to read the downtrodden into prayer and documents — hospitals and bread before argument.",
+      "blurb": "Mercy room to read the downtrodden into prayer and documents: hospitals and bread before argument.",
       "rankings": [],
       "reviews": [],
       "railPins": []
@@ -510,7 +510,7 @@
     {
       "slug": "documents",
       "displayName": "Documents",
-      "purpose": "Slow reading porch for encyclicals and letters — sourced, FACT-labeled, not headline-flattened.",
+      "purpose": "Slow reading porch for encyclicals and letters: sourced, FACT-labeled, not headline-flattened.",
       "parent": null,
       "seedAsTopic": true,
       "sourceLinks": [
@@ -522,7 +522,7 @@
       "nav": true,
       "label": "Documents",
       "kind": "theme",
-      "blurb": "Slow reading porch for encyclicals and letters — sourced, FACT-labeled, not headline-flattened.",
+      "blurb": "Slow reading porch for encyclicals and letters: sourced, FACT-labeled, not headline-flattened.",
       "rankings": [],
       "reviews": [],
       "railPins": []
@@ -530,7 +530,7 @@
     {
       "slug": "word-of-the-day",
       "displayName": "Word of the Day",
-      "purpose": "Daily Gospel companion via Vatican News outbound — cite and link, never paste the body.",
+      "purpose": "Daily Gospel companion via Vatican News outbound: cite and link, never paste the body.",
       "parent": null,
       "seedAsTopic": true,
       "sourceLinks": [
@@ -542,7 +542,7 @@
       "nav": true,
       "label": "Word of the Day",
       "kind": "theme",
-      "blurb": "Daily Gospel companion via Vatican News outbound — cite and link, never paste the body.",
+      "blurb": "Daily Gospel companion via Vatican News outbound: cite and link, never paste the body.",
       "rankings": [],
       "reviews": [],
       "railPins": []
@@ -553,7 +553,7 @@
     "maxSeconds": 15,
     "maxBytes": 8000000
   },
-  "seedNote": "sample — not mixed into the live feed",
+  "seedNote": "sample, not mixed into the live feed",
   "seed": [
     {
       "id": "p1",
@@ -782,7 +782,7 @@
         "tag": "Vatican",
         "headline": "Vatican Media Live",
         "url": "https://www.youtube.com/user/vatican/live",
-        "snippet": "Official papal Masses/celebrations — live when on air. Opens on YouTube. Outbound only; we do not host.",
+        "snippet": "Official papal Masses/celebrations: live when on air. Opens on YouTube. Outbound only; we do not host.",
         "meta": "Official · link-out"
       },
       {
