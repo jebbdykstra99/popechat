@@ -1,6 +1,6 @@
 # popechat
 
-Urbi et orbi. To the city and the world.
+Pray. Sing. Meditate.
 
 Static SubX dress rehearsal for popechat.com. Dummy feed about the papacy and the Holy See. Not official Vatican. Not a meme. Not X.com.
 

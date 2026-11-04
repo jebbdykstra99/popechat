@@ -3,7 +3,7 @@
   "dms": true,
   "redditSr": "popechat",
   "name": "popechat",
-  "tagline": "Urbi et orbi.",
+  "tagline": "Pray. Sing. Meditate.",
   "composePlaceholder": "What's on your mind, in the square?",
   "emptyState": "This room is empty. Sign in with email to speak in the square. Guest can browse only.",
   "theme": {
@@ -773,7 +773,7 @@
   "rail": {
     "kind": "porch",
     "title": "Room Brief",
-    "kicker": "Urbi et orbi",
+    "kicker": "Pray. Sing. Meditate.",
     "meta": "From the source",
     "footer": "Vatican News as a link. Not a lectionary paste. Ads off. Not official Vatican. Not a meme. Watch Mass live via official outbound only. Not hosted here. Not a substitute for parish Mass when you can go. Virtual tours open on the Museums site. We do not host them. Not a Mass. Not a substitute for an in-person visit.",
     "maxCards": 12,
