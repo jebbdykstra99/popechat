@@ -1,7 +1,6 @@
 {
   "siteId": "popechat",
   "dms": true,
-  "redditSr": "popechat",
   "name": "popechat",
   "tagline": "Pray. Sing. Meditate.",
   "composePlaceholder": "What's on your mind, in the square?",
@@ -1002,5 +1001,9 @@
     "notes": "Factory followable topics (StockTwits-style). Users keep/unfollow/add on their watchlist."
   },
   "v": 1,
-  "cacheBust": 1
+  "cacheBust": 1,
+  "pixel": false,
+  "redditCrosspost": false,
+  "imageUploads": false,
+  "accountsOpen": true
 }
