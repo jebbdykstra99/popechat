@@ -1078,10 +1078,10 @@
     storageDel(sessionStorage, GOOGLE_REDIRECT_KEY);
     storageDel(localStorage, GOOGLE_REDIRECT_KEY);
   }
-  function showGooglePopupBlocked() {
+  function showGooglePopupBlocked(msg) {
     var err = document.getElementById('cv-login-err');
     if (!err) return;
-    err.textContent = 'Google popup was blocked. Allow popups for this site, or use email.';
+    err.textContent = msg || 'Google sign-in did not complete. Try again or use email.';
     err.classList.add('show');
   }
   function clearAuthAction() {
@@ -5796,7 +5796,7 @@
      }
      function redirectGoogle() {
        rememberGoogleRedirect();
-       showGooglePopupBlocked();
+       showGooglePopupBlocked('Google popup sign-in could not open. Trying another sign-in method.');
        return fbAuth.signInWithRedirect(provider).catch(function (e2) {
          clearGoogleRedirect();
          failGoogle(e2);
