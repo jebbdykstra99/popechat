@@ -318,7 +318,7 @@
         {
           "tag": "Lead",
           "headline": "Hymns & song: Lead",
-          "snippet": "Featured this weekend: Te Deum. Title only, no lyric dump.",
+          "snippet": "Featured: Te Deum. Title only, no lyric dump.",
           "meta": "Nest · Lead",
           "url": "/?nest=hymns"
         },
@@ -333,7 +333,7 @@
       "lead": {
         "kicker": "Lead",
         "title": "Hymns & song: Lead",
-        "body": "Featured this weekend: Te Deum (title only in-rail, no lyric dump).\n\nFACT (Official · link-out): Vatican News prayer page, “The Te Deum”: https://www.vaticannews.va/en/prayers/the-te-deum.html\n\nSTORYLINE (seat guidance): Praise that belongs after mercy received. Sing at parish or from your hymnal when you can. This nest points you there; it does not host a concert or paste copyrighted lyrics.\n\nShare other hymn titles that console the poor in spirit (title + one sentence why). Mercy before performance.",
+        "body": "Featured: Te Deum (title only in-rail, no lyric dump).\n\nFACT (Official · link-out): Vatican News prayer page, “The Te Deum”: https://www.vaticannews.va/en/prayers/the-te-deum.html\n\nSTORYLINE (seat guidance): Praise that belongs after mercy received. Sing at parish or from your hymnal when you can. This nest points you there; it does not host a concert or paste copyrighted lyrics.\n\nShare other hymn titles that console the poor in spirit (title + one sentence why). Mercy before performance.",
         "footer": "Not official Vatican. Not a meme. Not a substitute for your parish Mass. FACT · Official · link-out: Vatican News.",
         "outbound": {
           "label": "The Te Deum",
