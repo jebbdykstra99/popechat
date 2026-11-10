@@ -21,11 +21,26 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Spectral:ital,wght@0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=15">
-  <link rel="preload" href="site.json?v=19" as="fetch" crossorigin="anonymous">
+  <link rel="stylesheet" href="styles.css?v=16">
+  <link rel="preload" href="site.json?v=20" as="fetch" crossorigin="anonymous">
 </head>
 <body>
 <div class="preview-banner" role="status">Preview only.</div>
+
+<!-- One-tap listen: prayer / meditation / chant / hymn / song (Web Speech; texts from room nests) -->
+<nav class="onetap-listen" id="onetap-listen" aria-label="Listen: prayer, meditation, chant, hymn, or song">
+  <div class="onetap-listen-inner">
+    <span class="onetap-listen-label" id="onetap-status">Listen</span>
+    <div class="onetap-listen-btns" role="group" aria-label="Start listening">
+      <button type="button" class="onetap-btn" data-onetap="pray" aria-label="Pray: listen to a short prayer">Pray</button>
+      <button type="button" class="onetap-btn" data-onetap="meditate" aria-label="Meditate: listen to a short meditation">Meditate</button>
+      <button type="button" class="onetap-btn" data-onetap="chant" aria-label="Chant: listen to the Te Deum in Latin">Chant</button>
+      <button type="button" class="onetap-btn" data-onetap="hymn" aria-label="Hymn: listen to a short hymn companion">Hymn</button>
+      <a class="onetap-btn onetap-link" data-onetap="song" href="/?nest=hymns" aria-label="Song: open the Hymns nest">Song</a>
+      <button type="button" class="onetap-btn onetap-stop" id="onetap-stop" hidden aria-label="Stop listening">Stop</button>
+    </div>
+  </div>
+</nav>
 
 <button class="hamburger" id="hamburger" aria-label="Open navigation" aria-controls="sidebar" aria-expanded="false">
   <span></span><span></span><span></span>
@@ -363,7 +378,154 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
-  <script src="factory.js?v=43" data-site="site.json?v=19"></script>
+
+<script>
+/* popechat one-tap listen (Web Speech API). Texts are room companion copy already in site.json nests;
+   no copyrighted hymn lyrics. Song has no speakable body so it links to the hymns nest. */
+(function () {
+  var TEXTS = {
+    pray: {
+      label: 'Prayer',
+      lang: 'en-US',
+      // intentions nest audio.text (public companion prayer in site.json)
+      text: 'Lord Jesus, you welcome the repentant and go ahead of the proud. Receive the names we carry: the downtrodden, the poor, the unseen, the afraid. Hold what we cannot fix. Teach us to listen before we speak. Amen.'
+    },
+    meditate: {
+      label: 'Meditation',
+      lang: 'en-US',
+      // meditation nest audio.text
+      text: 'Sit as you are. Soften your jaw. One breath in. One breath out. Lord, you are near. If a name rises (a person who is poor, tired, or unseen), hold them without fixing them. If resistance rises (I will not), ask for the grace to turn toward the vineyard anyway. Jesus Christ is Lord. Rest one breath in silence.'
+    },
+    chant: {
+      label: 'Chant',
+      lang: 'la',
+      // hymns nest audio.latin: public-domain Te Deum (site.json). Not sung; device voice quality varies.
+      text: 'Te Deum laudamus: te Dominum confitemur. Te aeternum Patrem omnis terra veneratur. Tibi omnes Angeli, tibi caeli et universae potestates: tibi Cherubim et Seraphim incessabili voce proclamant: Sanctus, Sanctus, Sanctus, Dominus Deus Sabaoth.'
+    },
+    hymn: {
+      label: 'Hymn',
+      lang: 'en-US',
+      // hymns nest audio.text: English companion only (no lyric dump)
+      text: 'Hymns companion. Featured: Te Deum. We praise you, O God. This voice speaks English. It is not sung Latin, and it is not a perfect liturgy. Sing at your parish or from your hymnal when you can.'
+    }
+  };
+
+  var synth = window.speechSynthesis || null;
+  var bar = document.getElementById('onetap-listen');
+  var statusEl = document.getElementById('onetap-status');
+  var stopBtn = document.getElementById('onetap-stop');
+  if (!bar) return;
+
+  var voicesReady = false;
+  var activeKey = null;
+
+  function setStatus(msg) {
+    if (statusEl) statusEl.textContent = msg || 'Listen';
+  }
+
+  function setSpeaking(on, key) {
+    activeKey = on ? key : null;
+    if (stopBtn) stopBtn.hidden = !on;
+    bar.classList.toggle('is-speaking', !!on);
+    var btns = bar.querySelectorAll('.onetap-btn[data-onetap]');
+    for (var i = 0; i < btns.length; i++) {
+      var k = btns[i].getAttribute('data-onetap');
+      btns[i].setAttribute('aria-pressed', on && k === key ? 'true' : 'false');
+      btns[i].classList.toggle('is-active', !!(on && k === key));
+    }
+  }
+
+  function pickVoice(lang) {
+    if (!synth) return null;
+    var voices = [];
+    try { voices = synth.getVoices() || []; } catch (e) { voices = []; }
+    if (!voices.length) return null;
+    var primary = (lang || 'en').toLowerCase();
+    var short = primary.split('-')[0];
+    var i, v;
+    for (i = 0; i < voices.length; i++) {
+      v = voices[i];
+      if ((v.lang || '').toLowerCase() === primary) return v;
+    }
+    for (i = 0; i < voices.length; i++) {
+      v = voices[i];
+      if ((v.lang || '').toLowerCase().indexOf(short) === 0) return v;
+    }
+    return voices[0] || null;
+  }
+
+  function stop() {
+    if (synth) {
+      try { synth.cancel(); } catch (e) {}
+    }
+    setSpeaking(false, null);
+    setStatus('Listen');
+  }
+
+  function speak(key) {
+    var entry = TEXTS[key];
+    if (!entry) return;
+    if (!synth || typeof window.SpeechSynthesisUtterance === 'undefined') {
+      setStatus('Speech not supported here');
+      return;
+    }
+    // iOS: cancel + speak must run inside the user-gesture handler
+    try { synth.cancel(); } catch (e) {}
+    var u = new SpeechSynthesisUtterance(entry.text);
+    u.lang = entry.lang || 'en-US';
+    u.rate = 0.9;
+    try {
+      var voice = pickVoice(u.lang);
+      if (voice) u.voice = voice;
+    } catch (voiceErr) { /* some engines reject non-native voice objects */ }
+    u.onend = function () { setSpeaking(false, null); setStatus('Listen'); };
+    u.onerror = function () { setSpeaking(false, null); setStatus('Listen'); };
+    try {
+      synth.speak(u);
+      setSpeaking(true, key);
+      setStatus(entry.label + '…');
+    } catch (err) {
+      setSpeaking(false, null);
+      setStatus('Could not start');
+    }
+  }
+
+  function onVoices() {
+    voicesReady = true;
+    try { synth.getVoices(); } catch (e) {}
+  }
+  if (synth) {
+    onVoices();
+    if (typeof synth.addEventListener === 'function') {
+      synth.addEventListener('voiceschanged', onVoices);
+    } else {
+      synth.onvoiceschanged = onVoices;
+    }
+  }
+
+  bar.addEventListener('click', function (e) {
+    var t = e.target;
+    if (!t || !t.closest) return;
+    var stopHit = t.closest('#onetap-stop');
+    if (stopHit) {
+      e.preventDefault();
+      stop();
+      return;
+    }
+    var btn = t.closest('.onetap-btn[data-onetap]');
+    if (!btn || btn.classList.contains('onetap-link')) return;
+    e.preventDefault();
+    var key = btn.getAttribute('data-onetap');
+    if (activeKey === key) {
+      stop();
+      return;
+    }
+    speak(key);
+  });
+})();
+</script>
+
+  <script src="factory.js?v=43" data-site="site.json?v=20"></script>
   <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@1/index.js"></script>
 <footer class="legal-footer" role="contentinfo" aria-label="Legal">
   <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a> ·

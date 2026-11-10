@@ -318,7 +318,7 @@
         {
           "tag": "Lead",
           "headline": "Hymns & song: Lead",
-          "snippet": "Featured this weekend: Te Deum. Title only, no lyric dump.",
+          "snippet": "Featured: Te Deum. Title only, no lyric dump.",
           "meta": "Nest · Lead",
           "url": "/?nest=hymns"
         },
@@ -333,7 +333,7 @@
       "lead": {
         "kicker": "Lead",
         "title": "Hymns & song: Lead",
-        "body": "Featured this weekend: Te Deum (title only in-rail, no lyric dump).\n\nFACT (Official · link-out): Vatican News prayer page, “The Te Deum”: https://www.vaticannews.va/en/prayers/the-te-deum.html\n\nSTORYLINE (seat guidance): Praise that belongs after mercy received. Sing at parish or from your hymnal when you can. This nest points you there; it does not host a concert or paste copyrighted lyrics.\n\nShare other hymn titles that console the poor in spirit (title + one sentence why). Mercy before performance.",
+        "body": "Featured: Te Deum (title only in-rail, no lyric dump).\n\nFACT (Official · link-out): Vatican News prayer page, “The Te Deum”: https://www.vaticannews.va/en/prayers/the-te-deum.html\n\nSTORYLINE (seat guidance): Praise that belongs after mercy received. Sing at parish or from your hymnal when you can. This nest points you there; it does not host a concert or paste copyrighted lyrics.\n\nShare other hymn titles that console the poor in spirit (title + one sentence why). Mercy before performance.",
         "footer": "Not official Vatican. Not a meme. Not a substitute for your parish Mass. FACT · Official · link-out: Vatican News.",
         "outbound": {
           "label": "The Te Deum",
@@ -346,7 +346,7 @@
         "voice": "bm_george",
         "rate": 0.75,
         "lang": "en",
-        "text": "Hymns companion. Featured this weekend: Te Deum. We praise you, O God. This voice speaks English. It is not sung Latin, and it is not a perfect liturgy. Sing at your parish or from your hymnal when you can.",
+        "text": "Hymns companion. Featured: Te Deum. We praise you, O God. This voice speaks English. It is not sung Latin, and it is not a perfect liturgy. Sing at your parish or from your hymnal when you can.",
         "caption": "English companion · not sung Latin · not a perfect liturgy",
         "latin": "Te Deum laudamus: te Dominum confitemur. Te aeternum Patrem omnis terra veneratur. Tibi omnes Angeli, tibi caeli et universae potestates: tibi Cherubim et Seraphim incessabili voce proclamant: Sanctus, Sanctus, Sanctus, Dominus Deus Sabaoth.",
         "latinCaveat": "Not spoken. kokoro-js phonemizes English only (en-us or en), so the Latin Te Deum is not sent to the model.",

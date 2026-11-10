@@ -296,7 +296,7 @@ body.right-collapsed .right-panel-tab svg { transform: scaleX(1); }
   display: flex;
   border-bottom: 1px solid var(--border);
   background: var(--bg);
-  position: sticky; top: 0; z-index: 5;
+  position: sticky; top: calc(2.15rem + 2.9rem); z-index: 5;
 }
 .thoughts-tab {
   flex: 1; text-align: center;
@@ -871,9 +871,135 @@ body.nav-collapsed .hamburger:hover { background: rgba(0,0,0,0.07); }
   letter-spacing: 0.03em; padding: 0.48rem 1rem;
   border-bottom: 1px solid rgba(255,255,255,0.12);
 }
-body { padding-top: 2.15rem; }
-.sidebar { top: 2.15rem; }
-.hamburger { top: calc(0.7rem + 2.15rem); }
+
+/* One-tap listen bar: sits under the preview banner, above feed; never under the legal footer */
+.onetap-listen {
+  position: fixed;
+  top: 2.15rem;
+  left: 0;
+  right: 0;
+  z-index: 3900;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 1px 0 rgba(59, 24, 72, 0.06);
+}
+.onetap-listen-inner {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 0.4rem 0.75rem;
+  min-height: 2.7rem;
+}
+.onetap-listen-label {
+  flex: 0 0 auto;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-dark);
+  white-space: nowrap;
+}
+.onetap-listen-btns {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.35rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  max-width: 100%;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.onetap-listen-btns::-webkit-scrollbar { display: none; }
+.onetap-btn {
+  flex: 0 0 auto;
+  appearance: none;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 650;
+  line-height: 1;
+  padding: 0.55rem 0.85rem;
+  min-height: 40px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+.onetap-btn:hover,
+.onetap-btn:focus-visible {
+  border-color: var(--accent);
+  color: var(--nav-bg);
+  outline: none;
+}
+.onetap-btn.is-active,
+.onetap-btn[aria-pressed="true"] {
+  background: var(--nav-bg);
+  border-color: var(--nav-bg);
+  color: #f4f8fb;
+}
+.onetap-stop {
+  background: #5a1f2a;
+  border-color: #5a1f2a;
+  color: #fff;
+}
+.onetap-stop:hover,
+.onetap-stop:focus-visible {
+  color: #fff;
+  border-color: #3b1848;
+  background: #3b1848;
+}
+.onetap-link {
+  /* Song: no speakable body in-repo; navigates to hymns nest */
+}
+body { padding-top: calc(2.15rem + 2.9rem); }
+.sidebar { top: calc(2.15rem + 2.9rem); }
+.hamburger { top: calc(0.7rem + 2.15rem + 2.9rem); }
+.main { padding-top: 0; }
+@media (max-width: 900px) {
+  .onetap-listen { left: 0; }
+  .onetap-listen-inner { padding: 0.3rem 0.4rem 0.3rem 3.15rem; gap: 0.25rem; }
+  .onetap-listen-label { display: none; }
+  .onetap-listen-btns { gap: 0.22rem; overflow-x: hidden; }
+  .onetap-btn {
+    font-size: 0.72rem;
+    padding: 0.4rem 0.48rem;
+    min-height: 40px;
+  }
+  /* Compact square Stop: icon only; aria-label already "Stop" */
+  .onetap-stop {
+    width: 40px;
+    min-width: 40px;
+    padding: 0;
+    border-radius: 10px;
+    font-size: 0;
+    line-height: 0;
+  }
+  .onetap-stop::before {
+    content: "\25A0";
+    font-size: 0.85rem;
+    line-height: 1;
+    color: #fff;
+  }
+}
+@media (max-width: 400px) {
+  .onetap-listen-inner { padding: 0.28rem 0.3rem 0.28rem 3.05rem; }
+  .onetap-listen-btns { gap: 0.16rem; }
+  .onetap-btn {
+    font-size: 0.68rem;
+    padding: 0.38rem 0.4rem;
+    letter-spacing: -0.01em;
+  }
+}
 
 body.legal-page {
   display: block;
