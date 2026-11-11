@@ -5,11 +5,11 @@
   "siteId": "popechat",
   "files": {
     "factory.js": "e3a8df039c327664679121a12213a0d5018a3fc64fac4722e275e2ea72c1e4ae",
-    "styles.css": "28613dc091f40617de74a25c1892afddbdd382536b46a7fe39a23294f02daf36"
+    "styles.css": "530f84593072b3bfa5e6cd73a67ebaae952e291114f98d938a84d634ef302229"
   },
   "keepFiles": [
     "takedown.js"
   ],
   "exceptions": "see subx-factory EXCEPTIONS.md",
-  "stampedAt": "2026-11-05T17:55:25Z"
+  "stampedAt": "2026-11-11T16:37:57Z"
 }
