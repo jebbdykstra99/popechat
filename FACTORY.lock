@@ -5,13 +5,13 @@
   "siteId": "popechat",
   "files": {
     "factory.js": "92f1f39d16a17beb25e189e277fd66c118cbb9959db6de430db98d974e0e9915",
-    "factory-signin.js": "0ab646556073153ef6687202c523b643251793196b44ed21807fc14cab0bc2e9",
+    "factory-signin.js": "51ce100803d5cc7270fbfa488841cb75594b8c0bf092ee41c28460c1d4105958",
     "styles.css": "530f84593072b3bfa5e6cd73a67ebaae952e291114f98d938a84d634ef302229"
   },
   "keepFiles": [
     "takedown.js"
   ],
   "exceptions": "see subx-factory EXCEPTIONS.md",
-  "stampedAt": "2026-11-12T19:55:21Z",
-  "masterRef": "subx-factory cursor/signin-popup-redirect-2026-11-12 @ d9d3c59c887aeaa4859f9278111773040ca5c52f (FACTORY_RELEASE.json v1.2.10, factory-signin.js sha256 0ab646556073153ef6687202c523b643251793196b44ed21807fc14cab0bc2e9, 24551 B; factory.js sha256 92f1f39d16a17beb25e189e277fd66c118cbb9959db6de430db98d974e0e9915 unchanged). Blocked Google popup falls back to signInWithRedirect; a blocked notice replaces the normal button block."
+  "stampedAt": "2026-11-12T20:19:39Z",
+  "masterRef": "subx-factory cursor/signin-popup-redirect-2026-11-12 @ 0f98fa1f8dc1fb2b81db3bf7e8e407fb43537a2e (FACTORY_RELEASE.json v1.2.10, factory-signin.js sha256 51ce100803d5cc7270fbfa488841cb75594b8c0bf092ee41c28460c1d4105958, 24583 B; factory.js sha256 92f1f39d16a17beb25e189e277fd66c118cbb9959db6de430db98d974e0e9915 unchanged). A rejected redirect result replaces the normal button block and keeps its failure message."
 }
