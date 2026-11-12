@@ -1,15 +1,16 @@
 {
   "factory": "jebbdykstra99/subx-factory",
-  "version": "v1.2.8",
+  "version": "v1.2.9",
   "room": "popechat",
   "siteId": "popechat",
   "files": {
-    "factory.js": "e3a8df039c327664679121a12213a0d5018a3fc64fac4722e275e2ea72c1e4ae",
+    "factory.js": "7773ead896e3951ea5cd4ee0647b7e2eb839665486992f88a10328fa4444220f",
+    "factory-signin.js": "78c1595488a0d68f4bd2b8a9614aecf8425e576d549f4fd8737dc5cf03d21286",
     "styles.css": "530f84593072b3bfa5e6cd73a67ebaae952e291114f98d938a84d634ef302229"
   },
   "keepFiles": [
     "takedown.js"
   ],
   "exceptions": "see subx-factory EXCEPTIONS.md",
-  "stampedAt": "2026-11-11T16:37:57Z"
+  "stampedAt": "2026-11-12T06:17:24Z"
 }
