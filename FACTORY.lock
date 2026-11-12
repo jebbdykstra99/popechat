@@ -4,13 +4,13 @@
   "room": "popechat",
   "siteId": "popechat",
   "files": {
-    "factory.js": "b83e951b8e1e87f2b360cdca47eaaac6bad86d88c9ca065821f11053485e3fab",
-    "factory-signin.js": "1514be501b3c9d94c4e8a5c88413d7cdf2dfd1d4381bfc52b02b5be095e57291",
+    "factory.js": "7773ead896e3951ea5cd4ee0647b7e2eb839665486992f88a10328fa4444220f",
+    "factory-signin.js": "78c1595488a0d68f4bd2b8a9614aecf8425e576d549f4fd8737dc5cf03d21286",
     "styles.css": "530f84593072b3bfa5e6cd73a67ebaae952e291114f98d938a84d634ef302229"
   },
   "keepFiles": [
     "takedown.js"
   ],
   "exceptions": "see subx-factory EXCEPTIONS.md",
-  "stampedAt": "2026-11-12T05:49:09Z"
+  "stampedAt": "2026-11-12T06:17:24Z"
 }
