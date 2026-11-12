@@ -4,7 +4,7 @@
   "room": "popechat",
   "siteId": "popechat",
   "files": {
-    "factory.js": "25103bcb15e489d8e743df17248cd405e2889668d9eb15942f82036590844f94",
+    "factory.js": "92f1f39d16a17beb25e189e277fd66c118cbb9959db6de430db98d974e0e9915",
     "factory-signin.js": "0427ac92a3f672801964fdcf32002d301e2f85d6965f9de733b57bc4080bdb72",
     "styles.css": "530f84593072b3bfa5e6cd73a67ebaae952e291114f98d938a84d634ef302229"
   },
@@ -12,6 +12,6 @@
     "takedown.js"
   ],
   "exceptions": "see subx-factory EXCEPTIONS.md",
-  "stampedAt": "2026-11-12T18:14:52Z",
-  "masterRef": "subx-factory cursor/phone-cat-space-2026-11-12 @ d755c610b65e4c069a5609461f754151547dd6fa (FACTORY_RELEASE.json v1.2.10, factory.js sha256 25103bcb15e489d8e743df17248cd405e2889668d9eb15942f82036590844f94, 254994 B). Phone cat light backing (#fff/#111, --subx-cat-space 7.05rem)."
+  "stampedAt": "2026-11-12T18:31:47Z",
+  "masterRef": "subx-factory cursor/phone-cat-space-2026-11-12 @ 0931b06351a1dc68be00c16897a0465f907d0903 (FACTORY_RELEASE.json v1.2.10, factory.js sha256 92f1f39d16a17beb25e189e277fd66c118cbb9959db6de430db98d974e0e9915, 254995 B). Phone cat light backing (#fff/#111, --cat 7.05rem); desktop color var(--nav-text,#fff)."
 }
