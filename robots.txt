@@ -1,3 +1,47 @@
+# popechat robots.txt · public beta (lock lifted)
+# Search indexing allowed. Do not scrape or use any content for AI training (named bots below stay blocked).
+# Operated by SubX, LLC. Agent rules: https://popechat.com/terms.html
+# Contact: takedown@subx.it
+
 User-agent: *
+Allow: /
+Disallow: /preview-lift/
+
+# answer/search fetchers allowed for citation; training crawlers blocked per Terms (no model training).
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /preview-lift/
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /preview-lift/
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /preview-lift/
+
+User-agent: Claude-SearchBot
+Allow: /
+Disallow: /preview-lift/
+
+User-agent: Claude-User
+Allow: /
+Disallow: /preview-lift/
+
+User-agent: GPTBot
+User-agent: CCBot
+User-agent: Google-Extended
+User-agent: Bytespider
+User-agent: ClaudeBot
+User-agent: anthropic-ai
+User-agent: Applebot-Extended
+User-agent: Meta-ExternalAgent
+User-agent: cohere-ai
+User-agent: Diffbot
+User-agent: omgili
 Disallow: /
-# Preview only.
+
+# Note: no Allow line for /llms.txt. The file is fetchable directly; robots.txt does not need to
+# carve it out.
+
+Sitemap: https://popechat.com/sitemap.xml
