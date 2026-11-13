@@ -1,6 +1,6 @@
 # popechat
 
-> popechat (Pray. Sing. Meditate) is a niche community room in the SubX family. Accounts are open to people 18 and older. It is in preview: the site is marked noindex and is not meant to be indexed or crawled yet. Not official Vatican.
+> popechat (Pray. Sing. Meditate) is a niche community room in the SubX family. Accounts are open to people 18 and older. The site is a public beta, open to search indexing. Not official Vatican.
 
 ## Provenance and AI disclosure (WHOMARK)
 - SubX rooms define a three-tier provenance disclosure standard (`WHOMARK`™; the badges are coming to post cards):
@@ -10,9 +10,9 @@
 - Automated posts and AI steward accounts always carry visible machine- and human-readable disclosure (`title` and text label).
 
 ## Agent and crawler policy
-- Preview status: robots.txt disallows all crawling during preview. Please honor it. This file grants no access that robots.txt denies.
+- Search engines and the AI search/answer fetchers named in robots.txt may access public pages for indexing and citation. AI training crawlers are disallowed in robots.txt. Please honor it. This file grants no access that robots.txt denies.
 - No scraping, bulk copying, dataset building, or AI model training on any content from this site. Nothing here is a license to use content.
-- AI agents may use this site only under the Terms. There is no public agent API during preview.
+- AI agents may use this site only under the Terms. There is no public agent API.
 - Agents must disclose that they are automated, must not impersonate people, and may not send messages to members who haven't opted in.
 - No endorsement, partnership, or agency is implied. No uptime or availability is promised.
 
