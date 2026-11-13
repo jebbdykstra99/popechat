@@ -20,14 +20,14 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Spectral:ital,wght@0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=16">
+  <link rel="stylesheet" href="styles.css?v=17">
   <link rel="preload" href="site.json?v=20" as="fetch" crossorigin="anonymous">
 </head>
 <body>
 <div class="preview-banner" role="status">Beta: early and a bit unfinished. Not official Vatican.</div>
 
-<!-- One-tap listen: prayer / meditation / chant / hymn / song (Web Speech; texts from room nests) -->
-<nav class="onetap-listen" id="onetap-listen" aria-label="Listen: prayer, meditation, chant, hymn, or song">
+<!-- One-tap listen: prayer / meditation / chant / hymn / song / poems (Web Speech; texts from room nests) -->
+<nav class="onetap-listen" id="onetap-listen" aria-label="Listen: prayer, meditation, chant, hymn, song, or poems">
   <div class="onetap-listen-inner">
     <span class="onetap-listen-label" id="onetap-status">Listen</span>
     <div class="onetap-listen-btns" role="group" aria-label="Start listening">
@@ -36,6 +36,7 @@
       <button type="button" class="onetap-btn" data-onetap="chant" aria-label="Chant: listen to the Te Deum in Latin">Chant</button>
       <button type="button" class="onetap-btn" data-onetap="hymn" aria-label="Hymn: listen to a short hymn companion">Hymn</button>
       <a class="onetap-btn onetap-link" data-onetap="song" href="/?nest=hymns" aria-label="Song: open the Hymns nest">Song</a>
+      <a class="onetap-btn onetap-link" data-onetap="poems" href="/poems" aria-label="Poems: open the poems page">Poems</a>
       <button type="button" class="onetap-btn onetap-stop" id="onetap-stop" hidden aria-label="Stop listening">Stop</button>
     </div>
   </div>

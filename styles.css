@@ -992,12 +992,12 @@ body { padding-top: calc(2.15rem + 2.9rem); }
   }
 }
 @media (max-width: 400px) {
-  .onetap-listen-inner { padding: 0.28rem 0.3rem 0.28rem 3.05rem; }
-  .onetap-listen-btns { gap: 0.16rem; }
+  .onetap-listen-inner { padding: 0.28rem 0.22rem 0.28rem 3.05rem; }
+  .onetap-listen-btns { gap: 0.08rem; }
   .onetap-btn {
-    font-size: 0.68rem;
-    padding: 0.38rem 0.4rem;
-    letter-spacing: -0.01em;
+    font-size: 0.66rem;
+    padding: 0.38rem 0.26rem;
+    letter-spacing: -0.02em;
   }
 }
 
