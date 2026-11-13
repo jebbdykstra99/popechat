@@ -360,6 +360,69 @@
       }
     },
     {
+      "slug": "poems",
+      "displayName": "Poems, read aloud",
+      "purpose": "A test porch for public-domain poems read aloud, starting with Pied Beauty.",
+      "parent": null,
+      "seedAsTopic": true,
+      "sourceLinks": [
+        "https://en.wikisource.org/wiki/Poems_of_Gerard_Manley_Hopkins/Pied_Beauty"
+      ],
+      "notes": "TEST. Public-domain text only. Pre-rendered reading hosted in-repo at /poems/pied-beauty.mp3. Not a copyrighted lyric dump.",
+      "displayGroupLabel": "Liturgy",
+      "nav": true,
+      "label": "Poems, read aloud",
+      "kind": "theme",
+      "blurb": "Public-domain poems, read aloud. Not official Vatican.",
+      "rankings": [],
+      "reviews": [],
+      "railPins": [
+        {
+          "tag": "Lead",
+          "headline": "Poems, read aloud: Lead",
+          "snippet": "Featured: Pied Beauty, by Gerard Manley Hopkins. Public domain.",
+          "meta": "Nest · Lead",
+          "url": "/?nest=poems"
+        },
+        {
+          "tag": "Listen",
+          "headline": "Pied Beauty, read aloud",
+          "snippet": "Open the reading page for the spoken poem.",
+          "meta": "Reading",
+          "url": "/poems.html"
+        },
+        {
+          "tag": "FACT",
+          "headline": "Pied Beauty",
+          "snippet": "1918 text on Wikisource. Public domain.",
+          "meta": "Source · link-out",
+          "url": "https://en.wikisource.org/wiki/Poems_of_Gerard_Manley_Hopkins/Pied_Beauty"
+        }
+      ],
+      "lead": {
+        "kicker": "Lead",
+        "title": "Poems, read aloud: Lead",
+        "body": "Featured: Pied Beauty, by Gerard Manley Hopkins.\n\nFACT (source · link-out): 1918 text on Wikisource: https://en.wikisource.org/wiki/Poems_of_Gerard_Manley_Hopkins/Pied_Beauty\n\nSTORYLINE (seat guidance): This is a test toward a poetry room. The poem is public domain. Open /poems.html to hear a spoken reading. Not official Vatican.",
+        "footer": "Not official Vatican. Public-domain text. Read by an AI voice.",
+        "outbound": {
+          "label": "Pied Beauty, read aloud",
+          "url": "/poems.html",
+          "meta": "Reading"
+        }
+      },
+      "audio": {
+        "lang": "en",
+        "caption": "Read by an AI voice.",
+        "honesty": "Synthesized voice · not official Vatican audio",
+        "optionalInstrumental": {
+          "id": "POEM-001",
+          "label": "Pied Beauty · reading · public domain poem",
+          "url": "/poems/pied-beauty.mp3",
+          "note": "Pre-rendered reading of the public-domain text. If playback in-nest fails, open /poems.html."
+        }
+      }
+    },
+    {
       "slug": "intentions",
       "displayName": "Prayer intentions",
       "purpose": "Listening porch for names of the downtrodden, poor, unseen, and afraid: one intention is enough.",
@@ -945,6 +1008,16 @@
         "nestSlug": "hymns"
       },
       {
+        "id": "poems",
+        "label": "Poems, read aloud",
+        "kind": "spirit",
+        "blurb": "Public-domain poems, read aloud",
+        "followDefault": false,
+        "adminSeed": true,
+        "status": "active",
+        "nestSlug": "poems"
+      },
+      {
         "id": "vatican-news",
         "label": "Vatican News",
         "kind": "org",
@@ -1001,7 +1074,7 @@
     "notes": "Factory followable topics (StockTwits-style). Users keep/unfollow/add on their watchlist."
   },
   "v": 1,
-  "cacheBust": 1,
+  "cacheBust": 2,
   "pixel": false,
   "redditCrosspost": false,
   "imageUploads": false,
