@@ -54,6 +54,16 @@
       "nestSlug": "hymns"
     },
     {
+      "id": "poems",
+      "label": "Poems, read aloud",
+      "kind": "spirit",
+      "blurb": "Public-domain poems, read aloud",
+      "followDefault": false,
+      "adminSeed": true,
+      "status": "active",
+      "nestSlug": "poems"
+    },
+    {
       "id": "vatican-news",
       "label": "Vatican News",
       "kind": "org",
@@ -99,7 +109,7 @@
       "status": "active"
     }
   ],
-  "topicCount": 10,
+  "topicCount": 11,
   "defaultWatchlist": [
     "mass-reflection",
     "vespers",
