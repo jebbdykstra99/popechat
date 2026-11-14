@@ -1593,3 +1593,31 @@ body.legal-page {
   border: 1px solid currentColor; border-radius: 999px;
   padding: 0.05rem 0.45rem; line-height: 1.5;
 }
+
+/* Featured articles (factory-featured.js, Nov 14 2026) */
+.post-featured-pill {
+  font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--text);
+  background: var(--accent); border-radius: 999px;
+  padding: 0.05rem 0.5rem; line-height: 1.5;
+}
+.post.post-featured { box-shadow: inset 3px 0 0 var(--accent); }
+.post-more {
+  display: inline-block; margin: 0.3rem 0 0; padding: 0.15rem 0;
+  background: none; border: 0; cursor: pointer;
+  font: inherit; font-size: 0.92rem; font-weight: 600; color: var(--teal);
+}
+.post-more:hover { text-decoration: underline; }
+.post-more:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; border-radius: 4px; }
+.post-image.post-image-fixed { aspect-ratio: 16 / 9; background: var(--surface); }
+.post-image.post-image-fixed img { width: 100%; height: 100%; max-height: none; object-fit: cover; }
+.news-item-ours h3.news-item-headline { margin: 0 0 0.35rem; font-size: inherit; }
+.our-articles { list-style: none; margin: 0; padding: 0; }
+.our-articles li { padding: 0.35rem 0; border-top: 1px solid rgba(255,255,255,0.08); }
+.our-articles li:first-child { border-top: 0; }
+.our-articles a { display: block; color: #f0f4f7; font-weight: 600; text-decoration: none; line-height: 1.35; }
+.our-articles a:hover, .our-articles a:focus-visible { color: inherit; text-decoration: underline; }
+.our-articles-meta { display: block; font-size: 0.75rem; color: #8aa0b0; margin-top: 0.1rem; }
+.news-page-list .our-articles li { border-top-color: var(--border); }
+.news-page-list .our-articles a { color: var(--text); }
+.news-page-list .our-articles-meta { color: var(--text-muted); }
