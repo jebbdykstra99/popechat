@@ -832,6 +832,29 @@
       ]
     }
   ],
+  "featured": {
+    "featuredDays": 3,
+    "maxPinned": 3,
+    "articleMinChars": 600,
+    "label": "Our articles",
+    "handles": [
+      "romanbells",
+      "thesquare",
+      "colonnade",
+      "pilgrimthread",
+      "factrail",
+      "massoutbound",
+      "intentions",
+      "mercyfirst",
+      "docdesk",
+      "pilgrimear",
+      "vespersquiet",
+      "hymntitles",
+      "officechair",
+      "squareporch",
+      "letterdesk"
+    ]
+  },
   "rail": {
     "kind": "porch",
     "title": "Room Brief",
