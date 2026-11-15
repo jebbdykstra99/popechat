@@ -43,6 +43,10 @@
       white-space: pre-wrap;
     }
     .attr, .source, .back, .operator { margin: 0 0 0.7rem; font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--muted); }
+    .toc { margin: 0 0 1.5rem; font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; color: var(--muted); }
+    .toc summary { cursor: pointer; color: var(--nav); font-weight: 650; }
+    .toc ul { margin: 0.5rem 0 0; padding: 0 0 0 1.2rem; }
+    .toc li { margin: 0 0 0.3rem; }
     a { color: var(--nav); }
   </style>
 </head>
@@ -50,16 +54,27 @@
   <main>
     <p class="eyebrow">popechat</p>
     <h1>Poems, read aloud</h1>
-    <p class="lede">A public-domain poem, with a spoken reading. This is a test toward a poetry room. Not official Vatican.</p>
-    <div class="player">
-      <audio controls preload="none" src="/poems/pied-beauty.mp3">
-        Your browser does not play audio. <a href="/poems/pied-beauty.mp3">Download the reading of Pied Beauty</a>.
-      </audio>
-      <p class="ai-label">Read by an AI voice.</p>
-    </div>
-    <article>
+    <p class="lede">Public-domain poems, read aloud. This is a test toward a poetry room. Not official Vatican.</p>
+    <details class="toc">
+      <summary>Poems</summary>
+      <ul>
+        <li><a href="#pied-beauty">Pied Beauty</a></li>
+        <li><a href="#the-burning-babe">The Burning Babe</a></li>
+        <li><a href="#love-iii">Love (III)</a></li>
+        <li><a href="#peace">Peace</a></li>
+        <li><a href="#the-pillar-of-the-cloud">The Pillar of the Cloud</a></li>
+        <li><a href="#a-better-resurrection">A Better Resurrection</a></li>
+      </ul>
+    </details>
+    <article id="pied-beauty">
       <h2>Pied Beauty</h2>
       <p class="byline">Gerard Manley Hopkins</p>
+      <div class="player">
+        <audio controls preload="none" src="/poems/pied-beauty.mp3">
+          Your browser does not play audio. <a href="/poems/pied-beauty.mp3">Download the reading of Pied Beauty</a>.
+        </audio>
+        <p class="ai-label">Read by an AI voice.</p>
+      </div>
       <pre class="verse">Glory be to God for dappled things—
   For skies of couple-colour as a brinded cow;
   For rose-moles all in stipple upon trout that swim:
@@ -78,6 +93,12 @@ He fathers-forth whose beauty is past change:
     <article id="the-burning-babe">
       <h2>The Burning Babe</h2>
       <p class="byline">Robert Southwell, S.J.</p>
+      <div class="player">
+        <audio controls preload="none" src="/poems/burning-babe.mp3">
+          Your browser does not play audio. <a href="/poems/burning-babe.mp3">Download the reading of The Burning Babe</a>.
+        </audio>
+        <p class="ai-label">Read by an AI voice.</p>
+      </div>
       <pre class="verse">As I in hoary winter's night stood shivering in the snow,
 Surpris'd I was with sudden heat which made my heart to glow;
 And lifting up a fearful eye to view what fire was near,
@@ -100,6 +121,12 @@ And straight I called unto mind that it was Christmas day.</pre>
     <article id="love-iii">
       <h2>Love (III)</h2>
       <p class="byline">George Herbert</p>
+      <div class="player">
+        <audio controls preload="none" src="/poems/love-iii.mp3">
+          Your browser does not play audio. <a href="/poems/love-iii.mp3">Download the reading of Love (III)</a>.
+        </audio>
+        <p class="ai-label">Read by an AI voice.</p>
+      </div>
       <pre class="verse">Love bade me welcome: yet my soul drew back,
       Guiltie of dust and sinne.
 But quick-ey'd Love, observing me grow slack
@@ -126,6 +153,12 @@ You must sit down, sayes Love, and taste my meat:
     <article id="peace">
       <h2>Peace</h2>
       <p class="byline">Henry Vaughan</p>
+      <div class="player">
+        <audio controls preload="none" src="/poems/peace.mp3">
+          Your browser does not play audio. <a href="/poems/peace.mp3">Download the reading of Peace</a>.
+        </audio>
+        <p class="ai-label">Read by an AI voice.</p>
+      </div>
       <pre class="verse">My Soul, there is a country
 Afar beyond the stars,
 Where stands a winged sentry
@@ -152,6 +185,12 @@ Thy God, thy life, thy cure.</pre>
     <article id="the-pillar-of-the-cloud">
       <h2>The Pillar of the Cloud</h2>
       <p class="byline">John Henry Newman</p>
+      <div class="player">
+        <audio controls preload="none" src="/poems/pillar-of-the-cloud.mp3">
+          Your browser does not play audio. <a href="/poems/pillar-of-the-cloud.mp3">Download the reading of The Pillar of the Cloud</a>.
+        </audio>
+        <p class="ai-label">Read by an AI voice.</p>
+      </div>
       <pre class="verse">Lead, Kindly Light, amid the encircling gloom,
 Lead Thou me on!
 The night is dark, and I am far from home--
@@ -178,6 +217,12 @@ Which I have loved long since, and lost awhile.</pre>
     <article id="a-better-resurrection">
       <h2>A Better Resurrection</h2>
       <p class="byline">Christina Rossetti</p>
+      <div class="player">
+        <audio controls preload="none" src="/poems/a-better-resurrection.mp3">
+          Your browser does not play audio. <a href="/poems/a-better-resurrection.mp3">Download the reading of A Better Resurrection</a>.
+        </audio>
+        <p class="ai-label">Read by an AI voice.</p>
+      </div>
       <pre class="verse">I have no wit, no words, no tears;
 My heart within me like a stone
 Is numbed too much for hopes or fears;
