@@ -26,8 +26,8 @@
 <body>
 <div class="preview-banner" role="status">Beta: early and a bit unfinished. Not official Vatican.</div>
 
-<!-- One-tap listen: prayer / meditation / chant / hymn / song / poems (Web Speech; texts from room nests) -->
-<nav class="onetap-listen" id="onetap-listen" aria-label="Listen: prayer, meditation, chant, hymn, song, or poems">
+<!-- One-tap listen: Pray, Meditate, Chant, and Hymn play recorded mp3s in the poems voice. Song and Poems stay links. -->
+<nav class="onetap-listen" id="onetap-listen" aria-label="Listen: prayer, meditation, chant, hymn, song, or poems. Read by an AI voice.">
   <div class="onetap-listen-inner">
     <span class="onetap-listen-label" id="onetap-status">Listen</span>
     <div class="onetap-listen-btns" role="group" aria-label="Start listening">
@@ -39,7 +39,9 @@
       <a class="onetap-btn onetap-link" data-onetap="poems" href="/poems" aria-label="Poems: open the poems page">Poems</a>
       <button type="button" class="onetap-btn onetap-stop" id="onetap-stop" hidden aria-label="Stop listening">Stop</button>
     </div>
+    <span class="onetap-listen-credit">Read by an AI voice.</span>
   </div>
+  <audio id="onetap-audio" preload="none"></audio>
 </nav>
 
 <button class="hamburger" id="hamburger" aria-label="Open navigation" aria-controls="sidebar" aria-expanded="false">
@@ -380,128 +382,111 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
 
 <script>
-/* popechat one-tap listen (Web Speech API). Texts are room companion copy already in site.json nests;
-   no copyrighted hymn lyrics. Song has no speakable body so it links to the hymns nest. */
+/* popechat one-tap listen. Pray, Meditate, Chant, and Hymn play pre-rendered
+   mp3s in the poems voice (Piper en_US-ljspeech-high). No Web Speech fallback.
+   Song has no speakable body in this page, so it still links to the hymns nest.
+   Hymn audio is the existing English companion only (no lyric dump). */
 (function () {
-  var TEXTS = {
-    pray: {
-      label: 'Prayer',
-      lang: 'en-US',
-      // intentions nest audio.text (public companion prayer in site.json)
-      text: 'Lord Jesus, you welcome the repentant and go ahead of the proud. Receive the names we carry: the downtrodden, the poor, the unseen, the afraid. Hold what we cannot fix. Teach us to listen before we speak. Amen.'
-    },
-    meditate: {
-      label: 'Meditation',
-      lang: 'en-US',
-      // meditation nest audio.text
-      text: 'Sit as you are. Soften your jaw. One breath in. One breath out. Lord, you are near. If a name rises (a person who is poor, tired, or unseen), hold them without fixing them. If resistance rises (I will not), ask for the grace to turn toward the vineyard anyway. Jesus Christ is Lord. Rest one breath in silence.'
-    },
-    chant: {
-      label: 'Chant',
-      lang: 'la',
-      // hymns nest audio.latin: public-domain Te Deum (site.json). Not sung; device voice quality varies.
-      text: 'Te Deum laudamus: te Dominum confitemur. Te aeternum Patrem omnis terra veneratur. Tibi omnes Angeli, tibi caeli et universae potestates: tibi Cherubim et Seraphim incessabili voce proclamant: Sanctus, Sanctus, Sanctus, Dominus Deus Sabaoth.'
-    },
-    hymn: {
-      label: 'Hymn',
-      lang: 'en-US',
-      // hymns nest audio.text: English companion only (no lyric dump)
-      text: 'Hymns companion. Featured: Te Deum. We praise you, O God. This voice speaks English. It is not sung Latin, and it is not a perfect liturgy. Sing at your parish or from your hymnal when you can.'
-    }
+  var FILES = {
+    pray: { label: 'Prayer', src: '/listen/pray.mp3' },
+    meditate: { label: 'Meditation', src: '/listen/meditate.mp3' },
+    chant: { label: 'Chant', src: '/listen/chant.mp3' },
+    hymn: { label: 'Hymn', src: '/listen/hymn.mp3' }
   };
 
-  var synth = window.speechSynthesis || null;
   var bar = document.getElementById('onetap-listen');
   var statusEl = document.getElementById('onetap-status');
   var stopBtn = document.getElementById('onetap-stop');
+  var audio = document.getElementById('onetap-audio');
   if (!bar) return;
+  if (!audio) {
+    audio = document.createElement('audio');
+    audio.id = 'onetap-audio';
+    audio.preload = 'none';
+    bar.appendChild(audio);
+  }
 
-  var voicesReady = false;
   var activeKey = null;
+  var isPaused = false;
+  var playGen = 0;
 
   function setStatus(msg) {
     if (statusEl) statusEl.textContent = msg || 'Listen';
   }
 
-  function setSpeaking(on, key) {
-    activeKey = on ? key : null;
-    if (stopBtn) stopBtn.hidden = !on;
+  function setPlaying(on, key, paused) {
+    activeKey = (on || paused) ? key : null;
+    isPaused = !!paused;
+    if (stopBtn) stopBtn.hidden = !(on || paused);
     bar.classList.toggle('is-speaking', !!on);
     var btns = bar.querySelectorAll('.onetap-btn[data-onetap]');
     for (var i = 0; i < btns.length; i++) {
       var k = btns[i].getAttribute('data-onetap');
       btns[i].setAttribute('aria-pressed', on && k === key ? 'true' : 'false');
-      btns[i].classList.toggle('is-active', !!(on && k === key));
+      btns[i].classList.toggle('is-active', !!((on || paused) && k === key));
     }
-  }
-
-  function pickVoice(lang) {
-    if (!synth) return null;
-    var voices = [];
-    try { voices = synth.getVoices() || []; } catch (e) { voices = []; }
-    if (!voices.length) return null;
-    var primary = (lang || 'en').toLowerCase();
-    var short = primary.split('-')[0];
-    var i, v;
-    for (i = 0; i < voices.length; i++) {
-      v = voices[i];
-      if ((v.lang || '').toLowerCase() === primary) return v;
-    }
-    for (i = 0; i < voices.length; i++) {
-      v = voices[i];
-      if ((v.lang || '').toLowerCase().indexOf(short) === 0) return v;
-    }
-    return voices[0] || null;
   }
 
   function stop() {
-    if (synth) {
-      try { synth.cancel(); } catch (e) {}
-    }
-    setSpeaking(false, null);
+    try {
+      audio.pause();
+      audio.removeAttribute('src');
+      audio.load();
+    } catch (e) {}
+    setPlaying(false, null, false);
     setStatus('Listen');
   }
 
-  function speak(key) {
-    var entry = TEXTS[key];
+  function play(key) {
+    var entry = FILES[key];
     if (!entry) return;
-    if (!synth || typeof window.SpeechSynthesisUtterance === 'undefined') {
-      setStatus('Speech not supported here');
+    if (activeKey === key && !isPaused && !audio.paused) {
+      playGen += 1;
+      try { audio.pause(); } catch (e) {}
+      setPlaying(false, key, true);
+      setStatus('Paused');
       return;
     }
-    // iOS: cancel + speak must run inside the user-gesture handler
-    try { synth.cancel(); } catch (e) {}
-    var u = new SpeechSynthesisUtterance(entry.text);
-    u.lang = entry.lang || 'en-US';
-    u.rate = 0.9;
-    try {
-      var voice = pickVoice(u.lang);
-      if (voice) u.voice = voice;
-    } catch (voiceErr) { /* some engines reject non-native voice objects */ }
-    u.onend = function () { setSpeaking(false, null); setStatus('Listen'); };
-    u.onerror = function () { setSpeaking(false, null); setStatus('Listen'); };
-    try {
-      synth.speak(u);
-      setSpeaking(true, key);
+    if (activeKey === key && isPaused) {
+      var resumeGen = ++playGen;
+      var resume = audio.play();
+      setPlaying(true, key, false);
       setStatus(entry.label + '…');
-    } catch (err) {
-      setSpeaking(false, null);
-      setStatus('Could not start');
+      if (resume && typeof resume.catch === 'function') {
+        resume.catch(function (err) {
+          if (resumeGen !== playGen) return;
+          if (err && err.name === 'AbortError') return;
+          setPlaying(false, null, false);
+          setStatus('Could not start');
+        });
+      }
+      return;
+    }
+    var gen = ++playGen;
+    try { audio.pause(); } catch (e) {}
+    audio.src = entry.src;
+    var p = audio.play();
+    setPlaying(true, key, false);
+    setStatus(entry.label + '…');
+    if (p && typeof p.catch === 'function') {
+      p.catch(function (err) {
+        if (gen !== playGen) return;
+        if (err && err.name === 'AbortError') return;
+        setPlaying(false, null, false);
+        setStatus('Could not start');
+      });
     }
   }
 
-  function onVoices() {
-    voicesReady = true;
-    try { synth.getVoices(); } catch (e) {}
-  }
-  if (synth) {
-    onVoices();
-    if (typeof synth.addEventListener === 'function') {
-      synth.addEventListener('voiceschanged', onVoices);
-    } else {
-      synth.onvoiceschanged = onVoices;
-    }
-  }
+  audio.addEventListener('ended', function () {
+    setPlaying(false, null, false);
+    setStatus('Listen');
+  });
+  audio.addEventListener('error', function () {
+    if (!audio.getAttribute('src')) return;
+    setPlaying(false, null, false);
+    setStatus('Could not start');
+  });
 
   bar.addEventListener('click', function (e) {
     var t = e.target;
@@ -516,11 +501,7 @@
     if (!btn || btn.classList.contains('onetap-link')) return;
     e.preventDefault();
     var key = btn.getAttribute('data-onetap');
-    if (activeKey === key) {
-      stop();
-      return;
-    }
-    speak(key);
+    play(key);
   });
 })();
 </script>
@@ -539,6 +520,9 @@
   body{padding-bottom:34px}
   .sidebar,.right-panel,.profile-overlay,.chat-overlay,.notif-overlay,.explore-overlay{bottom:34px!important}
   @media (max-width:900px){.legal-footer{display:block!important;transform:none!important}}
+  #onetap-stop[hidden]{display:none!important;}
+  .onetap-listen-credit{display:none;flex:0 0 auto;align-self:center;margin:0 0 0 8px;font-size:11px;line-height:1.3;opacity:.75;white-space:nowrap;}
+  @media (min-width:901px){.onetap-listen-credit{display:inline;}}
 </style>
 </body>
 </html>
