@@ -4,15 +4,16 @@
   "room": "popechat",
   "siteId": "popechat",
   "files": {
-    "factory.js": "f18d07e4db5aaa2722f284aba542eb6b41a48699ae2bad0c54bbec5e558a29d0",
+    "factory.js": "b7b02a20040e32696e72eb9aa10e6b2ccf8c70477ef6779d21ce0abdfe4619b7",
     "factory-featured.js": "6a7b0944ad5ddffee073b0818d711fe88dc3761d310d3c3efb67d82759bda306",
     "factory-signin.js": "51ce100803d5cc7270fbfa488841cb75594b8c0bf092ee41c28460c1d4105958",
-    "styles.css": "7a2bc4708371ce1150fe6fe6a7507498b250fc091176442a82e19d1df1f14963"
+    "styles.css": "7a2bc4708371ce1150fe6fe6a7507498b250fc091176442a82e19d1df1f14963",
+    "factory-stories.js": "acfd124d2e58ab30a915134058f1405692a0379f38163668b10dbe20fd1540a7"
   },
   "keepFiles": [
     "takedown.js"
   ],
   "exceptions": "see subx-factory EXCEPTIONS.md",
-  "stampedAt": "2026-11-14T14:58:05Z",
+  "stampedAt": "2026-11-19T14:44:35Z",
   "masterRef": "subx-factory cursor/featured-articles-pilot-2026-11-14 @ 7d17a859d13eddd6dea5cbdbe7a7a30b097afcb2 (FACTORY_RELEASE.json v1.2.11 record, factory.js sha256 f18d07e4db5aaa2722f284aba542eb6b41a48699ae2bad0c54bbec5e558a29d0, 254966 B; factory-featured.js sha256 6a7b0944ad5ddffee073b0818d711fe88dc3761d310d3c3efb67d82759bda306, 9407 B). Featured articles rollout: site.json featured block, styles.css featured rules."
 }
